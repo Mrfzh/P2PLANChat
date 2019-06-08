@@ -39,6 +39,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     };
 
     @Override
+    protected void doBeforeSetContentView() {
+
+    }
+
+    @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
     }
@@ -65,6 +70,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     @Override
     protected void doInOnCreate() {
 
+    }
+
+    @Override
+    protected boolean isHideTitleBar() {
+        return true;
     }
 
     @Override

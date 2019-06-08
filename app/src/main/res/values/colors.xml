@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryDark">@android:color/black</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="color_main">#09C668</color>
+    <color name="color_main_dark">#43A047</color>
+
+    <color name="color_login_line">#dddddd</color>
+    <color name="color_login_bg">#ffffff</color>
+    <color name="color_login_main_bg">#eeeeee</color>
+    <color name="color_login_text">#f1f1f1</color>
+    <color name="color_login_text_bg_before_pressed">#00BFFF</color>
+    <color name="color_login_text_bg_after_pressed">#1E90FF</color>
+
+    <color name="color_register_main_bg">#eeeeee</color>
+    <color name="color_register_title_bar_bg">#e1e1e1</color>
+    <color name="color_register_title_text">#303030</color>
+    <color name="color_register_title_back_pressed">#bbbbbb</color>
+    <color name="color_register_line">#cccccc</color>
+    <color name="color_register_head_image_border">#999999</color>
+    <color name="color_register_text">#f1f1f1</color>
+
 </resources>

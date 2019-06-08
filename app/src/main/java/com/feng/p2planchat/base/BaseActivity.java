@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
 
 import com.feng.p2planchat.util.ToastUtil;
 
@@ -21,6 +22,10 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (isHideTitleBar()) {
+            //隐藏标题栏
+            supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
         doBeforeSetContentView();
         setContentView(getLayoutId());
 //        unBinder = ButterKnife.bind(this);  //绑定ButterKnife
@@ -61,9 +66,7 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     /**
      * 在setContentView方法前的操作
      */
-    protected void doBeforeSetContentView() {
-
-    }
+    protected abstract void doBeforeSetContentView();
 
     /**
      *  获取当前活动的布局
@@ -120,6 +123,13 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
      * 初始化数据和视图后再OnCreate方法中的操作
      */
     protected abstract void doInOnCreate();
+
+    /**
+     * 是否隐藏标题栏
+     *
+     * @return
+     */
+    protected abstract boolean isHideTitleBar();
 
     /**
      * 弹出Toast

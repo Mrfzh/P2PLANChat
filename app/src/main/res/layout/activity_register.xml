@@ -1,9 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.RegisterActivity">
+    android:background="@color/color_register_main_bg">
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/lv_register_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:orientation="horizontal"
+        android:background="@color/color_register_title_bar_bg">
+
+       <ImageView
+           android:id="@+id/iv_register_back"
+           android:layout_width="40dp"
+           android:layout_height="match_parent"
+           android:background="@drawable/selector_register_back"
+           android:src="@drawable/back_register"
+           android:scaleType="center"
+           android:focusable="true"
+           android:clickable="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="注册"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="@color/color_register_title_text"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.3dp"
+        android:layout_below="@id/lv_register_title_bar"
+        android:background="@color/color_register_line"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_register_head_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/lv_register_title_bar"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/default_head_image" />
+
+    <TextView
+        android:id="@+id/tv_register_edit_head_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/iv_register_head_image"
+        android:text="编辑头像"
+        android:textSize="12sp"/>
+
+    <EditText
+        android:id="@+id/et_register_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_below="@id/tv_register_edit_head_image"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/shape_register_input_bg"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:textCursorDrawable="@drawable/shape_register_cursor"
+        android:hint="请设置用户名，不能超过10字符"
+        android:textSize="16sp"
+        android:padding="10dp"
+        android:maxLength="10"/>
+
+    <EditText
+        android:id="@+id/et_register_password"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_below="@id/et_register_user_name"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/shape_register_input_bg"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:textCursorDrawable="@drawable/shape_register_cursor"
+        android:hint="请设置密码，不能超过20字符"
+        android:textSize="16sp"
+        android:padding="10dp"
+        android:inputType="textPassword"
+        android:maxLength="20"/>
+
+    <TextView
+        android:id="@+id/tv_register_enter"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_below="@id/et_register_password"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/selector_login_text_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="进入P2P聊天室"
+        android:textSize="16dp"
+        android:textColor="@color/color_register_text" />
+
+</RelativeLayout>
