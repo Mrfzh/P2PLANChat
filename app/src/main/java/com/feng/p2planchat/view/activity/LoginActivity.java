@@ -1,15 +1,16 @@
-package com.feng.p2planchat.view;
+package com.feng.p2planchat.view.activity;
 
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 
-public class RegisterActivity extends BaseActivity implements View.OnClickListener{
+public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
-    private ImageView mBackIv;
+    private TextView mLoginTv;
+    private TextView mRegisterTv;
 
     @Override
     protected void doBeforeSetContentView() {
@@ -18,7 +19,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_register;
+        return R.layout.activity_login;
     }
 
     @Override
@@ -33,8 +34,10 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void initView() {
-        mBackIv = findViewById(R.id.iv_register_back);
-        mBackIv.setOnClickListener(this);
+        mLoginTv = findViewById(R.id.tv_login_login);
+        mLoginTv.setOnClickListener(this);
+        mRegisterTv = findViewById(R.id.tv_login_register);
+        mRegisterTv.setOnClickListener(this);
     }
 
     @Override
@@ -50,9 +53,13 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //点击返回按钮
-            case R.id.iv_register_back:
-                finish();
+            //点击登录
+            case R.id.tv_login_login:
+                jumpToNewActivity(MainActivity.class);
+                break;
+            //进行注册
+            case R.id.tv_login_register:
+                jumpToNewActivity(RegisterActivity.class);
                 break;
             default:
                 break;

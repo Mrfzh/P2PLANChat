@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimary">@android:color/darker_gray</color>
     <color name="colorPrimaryDark">@android:color/black</color>
     <color name="colorAccent">#D81B60</color>
 
     <color name="color_main">#09C668</color>
     <color name="color_main_dark">#43A047</color>
+    <color name="color_white_max">#ffffff</color>
 
     <color name="color_login_line">#dddddd</color>
     <color name="color_login_bg">#ffffff</color>
@@ -21,5 +22,8 @@
     <color name="color_register_line">#cccccc</color>
     <color name="color_register_head_image_border">#999999</color>
     <color name="color_register_text">#f1f1f1</color>
+
+    <color name="color_main_tab_bg">#e1e1e1</color>
+    <color name="color_main_tab_text_before_pressed">#303030</color>
 
 </resources>

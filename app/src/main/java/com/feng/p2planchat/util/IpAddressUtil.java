@@ -31,7 +31,7 @@ public class IpAddressUtil {
             int ipAddress = wifiInfo.getIpAddress();
             return intToIp(ipAddress);
         } else {
-            // 未开启WiFi
+            //返回未开启WiFi时的ip地址
             return getHostIP();
         }
     }
@@ -43,11 +43,6 @@ public class IpAddressUtil {
                 (ipAddress >> 24 & 0xFF);
     }
 
-    /**
-     * 获取本机IPv4地址（无WiFi状态）
-     *
-     * @return
-     */
     private static String getHostIP() {
         String hostIp = null;
         try {
@@ -73,4 +68,6 @@ public class IpAddressUtil {
         }
         return hostIp;
     }
+
+
 }
