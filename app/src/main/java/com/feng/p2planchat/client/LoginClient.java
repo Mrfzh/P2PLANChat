@@ -41,21 +41,16 @@ public class LoginClient implements Runnable {
         InputStream is = null;
         OutputStream os = null;
         try {
-            Log.d(TAG, "run: run");
-            is = mSocket.getInputStream();
-            Log.d(TAG, "run: run 1");
-            Log.d(TAG, "run: is = " + is);
-            ObjectInputStream ois = new ObjectInputStream(is);
-            Log.d(TAG, "run: run 2");   //这里执行不到？？？
-            User user = (User) ois.readObject();    //读取服务端传来的User对象
-            Log.d(TAG, "run: run 3");
-            mListener.getUserInfo(user);        //回调得到的User对象
-            mSocket.shutdownInput();        //关闭客户端Socket的输入流
-
             os = mSocket.getOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
             oos.writeObject(mUser);     //写入User对象，里面包含自己的用户信息
             mSocket.shutdownOutput();   //关闭客户端Socket的输出流
+
+            is = mSocket.getInputStream();
+            ObjectInputStream ois = new ObjectInputStream(is);
+            User user = (User) ois.readObject();    //读取服务端传来的User对象
+            mListener.getUserInfo(user);        //回调得到的User对象
+            mSocket.shutdownInput();        //关闭客户端Socket的输入流
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
