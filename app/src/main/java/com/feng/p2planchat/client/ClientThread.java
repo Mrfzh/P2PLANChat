@@ -1,4 +1,4 @@
-package com.feng.p2planchat.thread;
+package com.feng.p2planchat.client;
 
 import com.feng.p2planchat.config.Constant;
 

@@ -8,6 +8,7 @@ import com.feng.p2planchat.R;
  */
 public class Constant {
     public static final int PORT = 30000;   //统一的端口号
+    public static final int USER_PORT = 20000;  //获取用户信息的端口号
 
     //主页面底部tab的title
     public static final String [] MAIN_TAB_TITLES = {"用户列表", "我"};
