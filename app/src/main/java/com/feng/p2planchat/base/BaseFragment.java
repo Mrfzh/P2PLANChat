@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.ToastUtil;
 
 /**
@@ -28,9 +29,9 @@ public abstract class BaseFragment<V extends BasePresenter> extends Fragment {
             mPresenter.attachView(this);
         }
 
-//        if (isRegisterEventBus()) {
-//            EventBusUtil.register(this);
-//        }
+        if (isRegisterEventBus()) {
+            EventBusUtil.register(this);
+        }
 
         doInOnCreate();
     }
@@ -49,10 +50,10 @@ public abstract class BaseFragment<V extends BasePresenter> extends Fragment {
         if (mPresenter != null) {
             mPresenter.detachView();
         }
-//
-//        if (isRegisterEventBus()) {
-//            EventBusUtil.unregister(this);
-//        }
+
+        if (isRegisterEventBus()) {
+            EventBusUtil.unregister(this);
+        }
     }
 
     /**
@@ -108,13 +109,13 @@ public abstract class BaseFragment<V extends BasePresenter> extends Fragment {
         startActivity(intent, bundle);
     }
 
-//    /**
-//     * 是否注册EventBus，注册后才可以订阅事件
-//     *
-//     * @return true表示绑定EventBus事件分发，默认不绑定，子类需要绑定的话复写此方法返回true.
-//     */
-//    protected boolean isRegisterEventBus() {
-//        return false;
-//    }
+    /**
+     * 是否注册EventBus，注册后才可以订阅事件
+     *
+     * @return true表示绑定EventBus事件分发，默认不绑定，子类需要绑定的话复写此方法返回true.
+     */
+    protected boolean isRegisterEventBus() {
+        return false;
+    }
 
 }

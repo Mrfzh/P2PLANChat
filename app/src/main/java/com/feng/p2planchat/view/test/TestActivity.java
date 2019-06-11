@@ -200,6 +200,7 @@ public class TestActivity extends BaseActivity implements View.OnClickListener{
                     "用户 " + System.currentTimeMillis());
             //给每个在线用户发出请求
             for (int i = 0; i < ipAddressList.size(); i++) {
+                //注意：如果对方没有打开相应端口，会抛出IOException
                 Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
                 LoginClient loginClient = new LoginClient(socket, user);
                 loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
@@ -215,8 +216,10 @@ public class TestActivity extends BaseActivity implements View.OnClickListener{
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            Log.d(TAG, "UnknownHostException : " + e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(TAG, "IOException : " + e.getMessage());
         }
     }
 

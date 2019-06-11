@@ -15,8 +15,15 @@ import com.feng.p2planchat.adapter.MainViewPagerAdapter;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
+import com.feng.p2planchat.config.EventBusCode;
+import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.eventbus.MainEvent;
 import com.feng.p2planchat.view.fragment.PersonFragment;
 import com.feng.p2planchat.view.fragment.UserListFragment;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +38,8 @@ public class MainActivity extends BaseActivity {
 
     private List<Fragment> mFragmentList = new ArrayList<>();
     private List<String> mTabTitleList = new ArrayList<>();
+
+    private List<User> mUserList;   //在线用户列表
 
     @Override
     protected void doBeforeSetContentView() {
@@ -114,6 +123,27 @@ public class MainActivity extends BaseActivity {
     @Override
     protected boolean isHideTitleBar() {
         return true;
+    }
+
+    /**
+     * 注册EventBus
+     *
+     * @return
+     */
+    @Override
+    protected boolean isRegisterEventBus() {
+        return true;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventCone(Event<MainEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.LOGIN_2_MAIN:
+                mUserList = event.getData().getUserList();
+                break;
+            default:
+                break;
+        }
     }
 
     /**

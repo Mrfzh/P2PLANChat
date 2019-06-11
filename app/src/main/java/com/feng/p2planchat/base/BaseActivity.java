@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 
+import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.ToastUtil;
 
 
@@ -16,7 +17,6 @@ import com.feng.p2planchat.util.ToastUtil;
  */
 public abstract class BaseActivity<T extends BasePresenter> extends AppCompatActivity {
 
-//    private Unbinder unBinder;
     protected T mPresenter;
 
     @Override
@@ -28,19 +28,17 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
         }
         doBeforeSetContentView();
         setContentView(getLayoutId());
-//        unBinder = ButterKnife.bind(this);  //绑定ButterKnife
 
         mPresenter = getPresenter();
         if (mPresenter != null) {
             mPresenter.attachView(this);
         }
 
-//        if (isRegisterEventBus()) {
-//            EventBusUtil.register(this);
-//        }
+        if (isRegisterEventBus()) {
+            EventBusUtil.register(this);
+        }
 
         initData();
-//        initToolbar();
         initView();
         doInOnCreate();
     }
@@ -49,18 +47,13 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     protected void onDestroy() {
         super.onDestroy();
 
-//        if (unBinder != null && unBinder != Unbinder.EMPTY) {
-//            unBinder.unbind();
-//            unBinder = null;
-//        }
-
         if (mPresenter != null) {
             mPresenter.detachView();
         }
 
-//        if (isRegisterEventBus()) {
-//            EventBusUtil.unregister(this);
-//        }
+        if (isRegisterEventBus()) {
+            EventBusUtil.unregister(this);
+        }
     }
 
     /**
@@ -87,32 +80,6 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
      * 初始化数据
      */
     protected abstract void initData();
-//
-//    /**
-//     * 获取toolbar实例
-//     *
-//     * @return toolbar实例
-//     */
-//    protected abstract Toolbar getToolbar();
-//
-//    /**
-//     * 是否设置toolbar左上角含返回按钮，没有toolbar请返回false
-//     *
-//     * @return
-//     */
-//    protected abstract boolean setToolbarBackIcon();
-//
-//    protected void initToolbar() {
-//        Toolbar toolbar = getToolbar();
-//        if (toolbar != null) {
-//            setSupportActionBar(toolbar);
-////            toolbar.setTitleTextAppearance(this, R.style.ToolbarTitle);    //设置标题字体样式
-//            if (setToolbarBackIcon()) {
-//                toolbar.setNavigationIcon(R.mipmap.back);
-//                toolbar.setNavigationOnClickListener(v -> finish());
-//            }
-//        }
-//    }
 
     /**
      * 初始化视图
@@ -140,34 +107,6 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
         ToastUtil.showToast(this, content);
     }
 
-//    /**
-//     * 设置toolbar的标题
-//     *
-//     * @param title 标题
-//     */
-//    protected void setToolbarTitle(String title) {
-//        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
-//    }
-
-//    /**
-//     * 设置状态栏的颜色
-//     *
-//     * @param color 颜色(R.color.xxx)
-//     */
-//    protected void setStateBarColor(int color) {
-//        BaseUtils.setStatusBarColor(this, color);
-//    }
-
-//    /**
-//     * 设置toolbar的颜色
-//     *
-//     * @param toolbar 要设置的toolbar
-//     * @param color 颜色(R.color.xxx)
-//     */
-//    protected void setToolbarColor(Toolbar toolbar, int color) {
-//        toolbar.setBackgroundColor(getResources().getColor(color));
-//    }
-
     /**
      * 跳转到另一活动
      *
@@ -190,12 +129,12 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     }
 
 
-//    /**
-//     * 是否注册EventBus，注册后才可以订阅事件
-//     *
-//     * @return true表示绑定EventBus事件分发，默认不绑定，子类需要绑定的话复写此方法返回true.
-//     */
-//    protected boolean isRegisterEventBus() {
-//        return false;
-//    }
+    /**
+     * 是否注册EventBus，注册后才可以订阅事件
+     *
+     * @return true表示绑定EventBus事件分发，默认不绑定，子类需要绑定的话复写此方法返回true.
+     */
+    protected boolean isRegisterEventBus() {
+        return false;
+    }
 }
