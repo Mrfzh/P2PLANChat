@@ -1,7 +1,5 @@
 package com.feng.p2planchat.client;
 
-import android.util.Log;
-
 import com.feng.p2planchat.entity.User;
 
 import java.io.IOException;

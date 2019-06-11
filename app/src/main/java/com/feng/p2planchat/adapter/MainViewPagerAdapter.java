@@ -15,12 +15,10 @@ import java.util.List;
 public class MainViewPagerAdapter extends FragmentStatePagerAdapter {
 
     private List<Fragment> mFragmentList;   //碎片集合
-    private List<String> mTabTitleList;     //title集合
 
-    public MainViewPagerAdapter(FragmentManager fm, List<Fragment> mFragmentList, List<String> mTabTitleList) {
+    public MainViewPagerAdapter(FragmentManager fm, List<Fragment> mFragmentList) {
         super(fm);
         this.mFragmentList = mFragmentList;
-        this.mTabTitleList = mTabTitleList;
     }
 
     @Override
@@ -33,9 +31,4 @@ public class MainViewPagerAdapter extends FragmentStatePagerAdapter {
         return mFragmentList.size();
     }
 
-    @Nullable
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return mTabTitleList.get(position);
-    }
 }

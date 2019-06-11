@@ -1,4 +1,4 @@
-package com.feng.p2planchat.view.activity;
+package com.feng.p2planchat.view.test;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;

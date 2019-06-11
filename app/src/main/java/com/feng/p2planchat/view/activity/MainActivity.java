@@ -59,8 +59,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         mContentVp = findViewById(R.id.vp_main_content);
-        mContentVp.setAdapter(new MainViewPagerAdapter(getSupportFragmentManager(),
-                mFragmentList, mTabTitleList));
+        mContentVp.setAdapter(new MainViewPagerAdapter(getSupportFragmentManager(), mFragmentList));
 
         mBottomTabTv = findViewById(R.id.tv_main_bottom_tab);
         mBottomTabTv.setupWithViewPager(mContentVp);    //将TabLayout和ViewPager关联起来

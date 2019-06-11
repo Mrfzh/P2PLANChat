@@ -10,10 +10,17 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     private String ipAddress;
     private String userName;
+    private byte [] headImage;
 
     public User(String ipAddress, String userName) {
         this.ipAddress = ipAddress;
         this.userName = userName;
+    }
+
+    public User(String ipAddress, String userName, byte[] headImage) {
+        this.ipAddress = ipAddress;
+        this.userName = userName;
+        this.headImage = headImage;
     }
 
     public String getIpAddress() {
@@ -30,5 +37,13 @@ public class User implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public byte[] getHeadImage() {
+        return headImage;
+    }
+
+    public void setHeadImage(byte[] headImage) {
+        this.headImage = headImage;
     }
 }

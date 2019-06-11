@@ -7,7 +7,7 @@ import com.feng.p2planchat.R;
  * Created on 2019/6/7
  */
 public class Constant {
-    public static final int PORT = 30000;   //统一的端口号
+
     public static final int USER_PORT = 20000;  //获取用户信息的端口号
 
     //主页面底部tab的title

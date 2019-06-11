@@ -4,80 +4,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.test.TestActivity">
-
-    <TextView
-        android:id="@+id/tv_test_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="128dp"
-        android:text="TextView"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+    tools:context=".view.test.Test2Activity">
 
     <Button
-        android:id="@+id/btn_test_get_ip"
+        android:id="@+id/btn_test2_load_picture"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="获取ip地址"
+        android:text="加载本地图片"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_test_check_net"
-        android:layout_width="0dp"
+    <ImageView
+        android:id="@+id/iv_test2_picture"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="检查网络"
+        android:layout_marginBottom="104dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_test_get_ip" />
+        android:src="@drawable/chat"/>
 
     <Button
-        android:id="@+id/btn_test_is_reach"
+        android:id="@+id/btn_test2_receive_picture"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="判断当前局域网哪些ip可达"
+        android:text="打开服务器，随时接收客户端发来的图片"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_test_check_net" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_test2_show_own_headImage" />
 
     <Button
-        android:id="@+id/btn_test_get_other_user_info"
+        android:id="@+id/btn_test2_send_picture"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="获取其他用户的信息"
+        android:text="向服务端发送图片"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_test_is_reach" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_test2_receive_picture" />
 
     <Button
-        android:id="@+id/btn_test_send_user_info"
+        android:id="@+id/btn_test2_show_own_headImage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="发送用户信息给其他用户"
+        android:text="显示自己的头像"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_test_get_other_user_info" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_test2_load_picture" />
+
+    <Button
+        android:id="@+id/btn_test2_bytes_and_bitmap"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Bitmap和Bytes的转换"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_test2_send_picture" />
 
 </android.support.constraint.ConstraintLayout>
