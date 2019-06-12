@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_register_main_bg">
@@ -44,7 +45,9 @@
         android:layout_below="@id/lv_register_title_bar"
         android:layout_centerInParent="true"
         android:layout_marginTop="30dp"
-        android:src="@drawable/default_head_image" />
+        android:src="@drawable/default_head_image"
+        app:civ_border_width="0.5dp"
+        app:civ_border_color="@android:color/darker_gray"/>
 
     <TextView
         android:id="@+id/tv_register_edit_head_image"
@@ -53,7 +56,8 @@
         android:layout_centerInParent="true"
         android:layout_below="@id/iv_register_head_image"
         android:text="编辑头像"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        android:layout_marginTop="5dp"/>
 
     <EditText
         android:id="@+id/et_register_user_name"
@@ -105,5 +109,14 @@
         android:text="进入P2P聊天室"
         android:textSize="16dp"
         android:textColor="@color/color_register_text" />
+
+    <ProgressBar
+        android:id="@+id/pb_register_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="@android:color/darker_gray"
+        android:visibility="gone" />
 
 </RelativeLayout>

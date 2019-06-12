@@ -18,9 +18,9 @@ public interface ILoginContract {
     interface Presenter {
         void loginSuccess(List<User> userList);
         void loginError(String errorMsg);
-        void login(String name, String password, Context context);
+        void login(User user, Context context);
     }
     interface Model {
-        void login(String name, String password, Context context);
+        void login(User user, Context context);
     }
 }

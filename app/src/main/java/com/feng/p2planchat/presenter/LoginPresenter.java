@@ -37,7 +37,7 @@ public class LoginPresenter extends BasePresenter<ILoginContract.View>
     }
 
     @Override
-    public void login(String name, String password, Context context) {
-        mModel.login(name, password, context);
+    public void login(User user, Context context) {
+        mModel.login(user, context);
     }
 }

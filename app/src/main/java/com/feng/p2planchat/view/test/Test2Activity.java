@@ -34,6 +34,7 @@ import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,12 +46,14 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
     private static final int REQUEST_CHOOSE_PHOTO_FROM_ALBUM = 1;
     private static final int UPDATE_USER_LIST = 3;
 
-    private Button mLoadPictureBtn;
+//    private Button mLoadPictureBtn;
     private ImageView mPictureIv;
     private Button mShowOwnHeadImageBtn;
     private Button mReceivePictureBtn;
     private Button mSendPictureBtn;
     private Button mBytesAndBitmapBtn;
+    private Button mSavePictureBtn;
+    private Button mLoadPictureBtn;
 
     private String mImagePath;  //选择的图片路径
     private Bitmap mBitmap;     //选中图片的bitmap
@@ -106,8 +109,8 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
 
     @Override
     protected void initView() {
-        mLoadPictureBtn = findViewById(R.id.btn_test2_load_picture);
-        mLoadPictureBtn.setOnClickListener(this);
+//        mLoadPictureBtn = findViewById(R.id.btn_test2_load_picture);
+//        mLoadPictureBtn.setOnClickListener(this);
         mPictureIv = findViewById(R.id.iv_test2_picture);
         mShowOwnHeadImageBtn = findViewById(R.id.btn_test2_show_own_headImage);
         mShowOwnHeadImageBtn.setOnClickListener(this);
@@ -117,6 +120,10 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
         mSendPictureBtn.setOnClickListener(this);
         mBytesAndBitmapBtn = findViewById(R.id.btn_test2_bytes_and_bitmap);
         mBytesAndBitmapBtn.setOnClickListener(this);
+        mSavePictureBtn = findViewById(R.id.btn_test2_save_picture);
+        mSavePictureBtn.setOnClickListener(this);
+        mLoadPictureBtn = findViewById(R.id.btn_test2_load_picture);
+        mLoadPictureBtn.setOnClickListener(this);
     }
 
     @Override
@@ -132,10 +139,10 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_test2_load_picture:
-                //从相册中选择
-                chooseFromAlbum();
-                break;
+//            case R.id.btn_test2_load_picture:
+//                //从相册中选择
+//                chooseFromAlbum();
+//                break;
             case R.id.btn_test2_show_own_headImage:
                 //显示自己的头像
                 mPictureIv.setImageBitmap(mOwnBitmap);
@@ -157,6 +164,16 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
                 Log.d(TAG, "bitmap = " + bitmap);
                 byte [] next = BitmapUtil.bitmap2ByteArray(bitmap);
                 Log.d(TAG, "after: mOwnPicBytes = " + Arrays.toString(next));
+                break;
+            case R.id.btn_test2_save_picture:
+                //存储图片到内部存储
+                BitmapUtil.save2InternalStorage(mOwnBitmap, "测试1.jpg", this);
+                showShortToast("存储成功");
+                break;
+            case R.id.btn_test2_load_picture:
+                //从内部存储加载图片
+                Bitmap bitmap1 = BitmapUtil.readFromInternalStorage("测试1.jpg", this);
+                mPictureIv.setImageBitmap(bitmap1);
                 break;
             default:
                 break;

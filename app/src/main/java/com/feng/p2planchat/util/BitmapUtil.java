@@ -3,10 +3,16 @@ package com.feng.p2planchat.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 
 import com.feng.p2planchat.R;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -66,6 +72,59 @@ public class BitmapUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * 将图片存储到内部存储中
+     *
+     * @param bitmap 图片的bitmap
+     * @param name 图片的名字
+     */
+    public static void save2InternalStorage(Bitmap bitmap, String name, Context context) {
+        if (bitmap == null) {
+            return;
+        }
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput(name, Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 从内部存储读取图片
+     *
+     * @param name 图片名
+     * @param context
+     * @return 图片的Bitmap
+     */
+    public static Bitmap readFromInternalStorage(String name, Context context) {
+        FileInputStream fis = null;
+        try {
+            fis = context.openFileInput(name);
+            return BitmapFactory.decodeStream(fis);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

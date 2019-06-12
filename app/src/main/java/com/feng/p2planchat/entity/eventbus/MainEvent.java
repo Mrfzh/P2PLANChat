@@ -9,10 +9,12 @@ import java.util.List;
  * Created on 2019/6/11
  */
 public class MainEvent {
-    private List<User> userList;
+    private List<User> userList;    //其他用户的信息
+    private User ownInfo;   //自己的信息
 
-    public MainEvent(List<User> userList) {
+    public MainEvent(List<User> userList, User ownInfo) {
         this.userList = userList;
+        this.ownInfo = ownInfo;
     }
 
     public List<User> getUserList() {
@@ -21,5 +23,13 @@ public class MainEvent {
 
     public void setUserList(List<User> userList) {
         this.userList = userList;
+    }
+
+    public User getOwnInfo() {
+        return ownInfo;
+    }
+
+    public void setOwnInfo(User ownInfo) {
+        this.ownInfo = ownInfo;
     }
 }

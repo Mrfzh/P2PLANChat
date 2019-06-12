@@ -127,7 +127,7 @@ public class TestActivity extends BaseActivity implements View.OnClickListener{
                 break;
             case R.id.btn_test_is_reach:
                 //判断当前局域网哪些ip可达
-                List<String> list = getIpAddressList();
+                List<String> list = IpAddressUtil.getIpAddressList(this);
                 mContentTv.setText(list.toString());
                 break;
             case R.id.btn_test_get_other_user_info:
@@ -194,7 +194,7 @@ public class TestActivity extends BaseActivity implements View.OnClickListener{
     private void sendInfo() {
         try {
             //得到其他在线用户的ip地址
-            List<String> ipAddressList = getIpAddressList();
+            List<String> ipAddressList = IpAddressUtil.getIpAddressList(this);
             //自己的用户信息
             User user = new User(IpAddressUtil.getIpAddress(this),
                     "用户 " + System.currentTimeMillis());
@@ -221,55 +221,6 @@ public class TestActivity extends BaseActivity implements View.OnClickListener{
             e.printStackTrace();
             Log.d(TAG, "IOException : " + e.getMessage());
         }
-    }
-
-    /**
-     * 获取其他在线用户的ip地址
-     *
-     * @return
-     */
-    private List<String> getIpAddressList() {
-        final List<String> ipAddressList = new ArrayList<>();
-
-        final String ipAddr = IpAddressUtil.getIpAddress(TestActivity.this);
-        final String prefix = ipAddr.substring(0, ipAddr.lastIndexOf(".") + 1);
-        final AtomicInteger atomicInteger = new AtomicInteger(0);
-
-        //创建256个线程分别去ping
-        for ( int i = 0; i < 256; i++) {
-            final int finalI = i;
-            new Thread(new Runnable() {
-                public void run() {
-                    //利用ping命令判断
-                    String current_ip = prefix + finalI;
-                    //要执行的ping命令，其中 -c 为发送的次数，-w 表示发送后等待响应的时间
-                    String ping = "ping -c 1 -w 5 " + current_ip;
-                    Process proc = null;
-                    try {
-                        proc = Runtime.getRuntime().exec(ping);
-                        int result = proc.waitFor();
-                        if (result == 0 && !current_ip.equals(ipAddr)) {
-                            ipAddressList.add(current_ip);
-                            Log.d(TAG, current_ip + ": true");
-                        }
-                        atomicInteger.incrementAndGet();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    } catch (InterruptedException e2) {
-                        e2.printStackTrace();
-                    } finally {
-                        assert proc != null;
-                        proc.destroy();
-                    }
-                }
-            }).start();
-        }
-
-        while (atomicInteger.get() < 256) {
-
-        }
-
-        return ipAddressList;
     }
 
 }

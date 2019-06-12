@@ -1,6 +1,9 @@
 package com.feng.p2planchat.view.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -19,12 +22,17 @@ import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.entity.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.service.HandleLoginService;
+import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.view.fragment.PersonFragment;
 import com.feng.p2planchat.view.fragment.UserListFragment;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +40,7 @@ import java.util.Objects;
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "fzh";
+    private static final int UPDATE_USER_LIST = 1;
 
     private TabLayout mBottomTabTv;
     private ViewPager mContentVp;
@@ -39,7 +48,31 @@ public class MainActivity extends BaseActivity {
     private List<Fragment> mFragmentList = new ArrayList<>();
     private List<String> mTabTitleList = new ArrayList<>();
 
-    private List<User> mUserList;   //在线用户列表
+    private List<User> mUserList = new ArrayList<>();   //在线用户列表
+    private User mOwnInfo;      //自己的用户信息
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_USER_LIST:
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < mUserList.size(); i++) {
+                        User curr = mUserList.get(i);
+                        builder.append("用户名：");
+                        builder.append(curr.getUserName());
+                        builder.append(", 用户IP地址：");
+                        builder.append(curr.getIpAddress());
+                        builder.append("\n");
+                    }
+                    Log.d(TAG, "handleMessage: " + builder.toString());
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void doBeforeSetContentView() {
@@ -117,7 +150,65 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void doInOnCreate() {
+        //打开服务器端，随时接收其他用户的登录信息
+        new Thread(new LoginServiceThread()).start();
 
+        User curr = mOwnInfo;
+        String builder1 = null;
+        if (curr != null) {
+            builder1 = "用户名：" +
+                    curr.getUserName() +
+                    ", 用户IP地址：" +
+                    curr.getIpAddress() +
+                    "\n";
+        }
+        Log.d(TAG, "ownInfo: " + builder1);
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < mUserList.size(); i++) {
+            User curr1 = mUserList.get(i);
+            if (curr == null) {
+                continue;
+            }
+            builder.append("用户名：");
+            builder.append(curr1.getUserName());
+            builder.append(", 用户IP地址：");
+            builder.append(curr1.getIpAddress());
+            builder.append("\n");
+        }
+        Log.d(TAG, "otherInfo: " + builder.toString());
+    }
+
+    class LoginServiceThread implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                //作为服务端，监听其他用户的登录信息
+                ServerSocket userServerSocket = new ServerSocket(Constant.USER_PORT);
+
+                //一直监听客户端
+                while (true) {
+                    Socket socket = userServerSocket.accept();
+                    //处理客户端的请求
+                    HandleLoginService service = new HandleLoginService(socket, mOwnInfo);
+                    service.setHandleLoginServiceListener(new HandleLoginService.HandleLoginServiceListener() {
+                        @Override
+                        public void getUserInfo(User user) {
+                            //添加新用户
+                            mUserList.add(user);
+                            //在主线程更新列表
+                            Message message = new Message();
+                            message.what = UPDATE_USER_LIST;
+                            mHandler.sendMessage(message);
+                        }
+                    });
+                    new Thread(service).start();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -135,10 +226,13 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventCone(Event<MainEvent> event) {
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onStickyEventBusCome(Event<MainEvent> event) {
         switch (event.getCode()) {
             case EventBusCode.LOGIN_2_MAIN:
+            case EventBusCode.REGISTER_2_MAIN:
+                Log.d(TAG, "onEventCone: run");
+                mOwnInfo = event.getData().getOwnInfo();
                 mUserList = event.getData().getUserList();
                 break;
             default:

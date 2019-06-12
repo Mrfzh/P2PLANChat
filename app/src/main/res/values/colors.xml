@@ -26,4 +26,10 @@
     <color name="color_main_tab_bg">#e1e1e1</color>
     <color name="color_main_tab_text_before_pressed">#303030</color>
 
+    <color name="color_tip_title">#505050</color>
+    <color name="color_tip_content">#888888</color>
+    <color name="color_tip_choice">#222222</color>
+    <color name="color_tip_line">#cccccc</color>
+    <color name="color_tip_bg">#f1f1f1</color>
+
 </resources>

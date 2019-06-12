@@ -98,7 +98,7 @@ public class IpAddressUtil {
                     //利用ping命令判断
                     String current_ip = prefix + finalI;
                     //要执行的ping命令，其中 -c 为发送的次数，-w 表示发送后等待响应的时间
-                    String ping = "ping -c 1 -w 3 " + current_ip;
+                    String ping = "ping -c 4 -w 5 " + current_ip;
                     Process proc = null;
                     try {
                         proc = Runtime.getRuntime().exec(ping);

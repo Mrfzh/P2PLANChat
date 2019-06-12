@@ -41,10 +41,28 @@ public class AccountOperation {
      */
     public boolean hasName(String name) {
         Cursor cursor = mDatabase.query(Constant.TABLE_ACCOUNT, new String[]{Constant.KEY_NAME},
-                Constant.KEY_NAME + " like ? ", new String[]{name}, null, null, null);
+                Constant.KEY_NAME + " like ? ", new String[]{name},
+                null, null, null);
         boolean result = cursor.moveToFirst();
         cursor.close();
         return result;
+    }
+
+    /**
+     * 通过账户名获取对应的密码
+     *
+     * @param name 账户名
+     * @return
+     */
+    public String getPassword(String name) {
+        Cursor cursor = mDatabase.query(Constant.TABLE_ACCOUNT, null,
+                Constant.KEY_NAME + " like ? ", new String[]{name},
+                null, null, null);
+        cursor.moveToFirst();
+        String password = cursor.getString(cursor.getColumnIndex(Constant.KEY_PASSWORD));
+        cursor.close();
+
+        return password;
     }
 
     /**
