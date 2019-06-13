@@ -13,7 +13,7 @@ import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.client.LoginClient;
 import com.feng.p2planchat.config.Constant;
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.service.HandleLoginService;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.NetUtil;
@@ -24,7 +24,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestActivity extends BaseActivity implements View.OnClickListener{
 

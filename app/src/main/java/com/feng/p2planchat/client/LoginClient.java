@@ -1,6 +1,8 @@
 package com.feng.p2planchat.client;
 
-import com.feng.p2planchat.entity.User;
+import android.util.Log;
+
+import com.feng.p2planchat.entity.bean.User;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +41,7 @@ public class LoginClient implements Runnable {
         InputStream is = null;
         OutputStream os = null;
         try {
+//            Log.d(TAG, "run: run 1");
             os = mSocket.getOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
             oos.writeObject(mUser);     //写入User对象，里面包含自己的用户信息
@@ -46,6 +49,7 @@ public class LoginClient implements Runnable {
 
             is = mSocket.getInputStream();
             ObjectInputStream ois = new ObjectInputStream(is);
+//            Log.d(TAG, "run: run 2");
             User user = (User) ois.readObject();    //读取服务端传来的User对象
             mListener.getUserInfo(user);        //回调得到的User对象
             mSocket.shutdownInput();        //关闭客户端Socket的输入流

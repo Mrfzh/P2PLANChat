@@ -1,6 +1,6 @@
 package com.feng.p2planchat.service;
 
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 
 import java.io.IOException;
 import java.io.InputStream;

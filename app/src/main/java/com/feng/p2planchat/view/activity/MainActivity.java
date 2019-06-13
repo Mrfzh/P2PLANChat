@@ -19,11 +19,12 @@ import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.service.HandleLoginService;
-import com.feng.p2planchat.util.IpAddressUtil;
+import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.view.fragment.PersonFragment;
 import com.feng.p2planchat.view.fragment.UserListFragment;
 
@@ -91,6 +92,11 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        //发送在线用户信息给用户列表页面
+        Event<UserListEvent> userListEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST,
+                new UserListEvent(mUserList));
+        EventBusUtil.sendStickyEvent(userListEvent);
+
         mFragmentList.add(new UserListFragment());
         mFragmentList.add(new PersonFragment());
 
@@ -228,6 +234,9 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onStickyEventBusCome(Event<MainEvent> event) {
+//        Log.d(TAG, "onStickyEventBusCome: urn");
+//        Log.d(TAG, "onStickyEventBusCome: event.getCode() = " + event.getCode());
+//        Log.d(TAG, "onStickyEventBusCome: event.getData() = " + event.getData());
         switch (event.getCode()) {
             case EventBusCode.LOGIN_2_MAIN:
             case EventBusCode.REGISTER_2_MAIN:

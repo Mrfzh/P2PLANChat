@@ -9,6 +9,12 @@ import com.feng.p2planchat.base.BasePresenter;
  * Created on 2019/6/9
  */
 public class PersonFragment extends BaseFragment {
+
+    @Override
+    protected void initData() {
+
+    }
+
     @Override
     protected void doInOnCreate() {
 

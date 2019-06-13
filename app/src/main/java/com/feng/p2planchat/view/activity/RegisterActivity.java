@@ -16,15 +16,15 @@ import android.widget.TextView;
 
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
-import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IRegisterContract;
 import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.RegisterPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
@@ -162,32 +162,49 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
         //先去掉空格
         name = name.replaceAll(" ", "");
         password = password.replaceAll(" ", "");
+
+        if (check(name, password)) {
+            //将新用户的用户名和密码写入数据库中
+            mAccountOperation.add(name, password);
+            if (mBitmap == null) {
+                //使用默认头像
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.default_head_image);
+            }
+            //将新用户的头像保存到本地
+            BitmapUtil.save2InternalStorage(mBitmap, name + ".jpg", this);
+
+            //保存自己的用户信息
+            mOwnInfo = new User(IpAddressUtil.getIpAddress(this), name,
+                    BitmapUtil.bitmap2ByteArray(mBitmap));
+
+            //进行注册操作
+            mPresenter.register(mOwnInfo, this);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 检查用户输入
+     *
+     * @return
+     */
+    private boolean check(String name, String password) {
         //判空
         if (name.equals("")) {
             showShortToast("用户名不能为空");
+            return false;
         } else if (password.equals("")) {
             showShortToast("密码不能为空");
+            return false;
         }
         //判断该用户是否已存在
         if (mAccountOperation.hasName(name)) {
             showShortToast("该用户已存在");
+            return false;
         }
 
-        //将新用户的用户名和密码写入数据库中
-        mAccountOperation.add(name, password);
-        if (mBitmap == null) {
-            //使用默认头像
-            mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.default_head_image);
-        }
-        //将新用户的头像保存到本地
-        BitmapUtil.save2InternalStorage(mBitmap, name + ".jpg", this);
-
-        //保存自己的用户信息
-        mOwnInfo = new User(IpAddressUtil.getIpAddress(this), name,
-                BitmapUtil.bitmap2ByteArray(mBitmap));
-
-        //进行注册操作
-        mPresenter.register(mOwnInfo, this);
+        return true;
     }
 
     /**
@@ -198,10 +215,15 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
     @Override
     public void registerSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+
         //发送在线用户信息给主活动
         Event<MainEvent> mainEvent = new Event<>(EventBusCode.REGISTER_2_MAIN,
                 new MainEvent(userList, mOwnInfo));
         EventBusUtil.sendStickyEvent(mainEvent);
+//        //发送在线用户信息给用户列表页面
+//        Event<UserListEvent> userListEvent = new Event<>(EventBusCode.REGISTER_2_USER_LIST,
+//                new UserListEvent(userList));
+//        EventBusUtil.sendStickyEvent(userListEvent);
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < userList.size(); i++) {

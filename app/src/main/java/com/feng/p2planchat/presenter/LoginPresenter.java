@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.contract.ILoginContract;
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.model.LoginModel;
 
 import java.util.List;

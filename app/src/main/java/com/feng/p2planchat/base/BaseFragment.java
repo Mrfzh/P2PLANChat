@@ -33,15 +33,20 @@ public abstract class BaseFragment<V extends BasePresenter> extends Fragment {
             EventBusUtil.register(this);
         }
 
+        initData();
         doInOnCreate();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initView();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(getLayoutId(), container, false);  //第三个参数一定要设为false
-        initView();
-        return view;
+        return inflater.inflate(getLayoutId(), container, false);
     }
 
     @Override
@@ -55,6 +60,11 @@ public abstract class BaseFragment<V extends BasePresenter> extends Fragment {
             EventBusUtil.unregister(this);
         }
     }
+
+    /**
+     * 初始化数据
+     */
+    protected abstract void initData();
 
     /**
      * 在onCreate方法中执行的操作

@@ -1,4 +1,4 @@
-package com.feng.p2planchat.entity;
+package com.feng.p2planchat.entity.bean;
 
 import java.io.Serializable;
 
@@ -45,5 +45,9 @@ public class User implements Serializable {
 
     public void setHeadImage(byte[] headImage) {
         this.headImage = headImage;
+    }
+
+    public String show() {
+        return "ip地址 = " + ipAddress + ", 用户名 = " + userName;
     }
 }

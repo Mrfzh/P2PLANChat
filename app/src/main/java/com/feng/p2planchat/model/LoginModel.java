@@ -6,7 +6,7 @@ import android.util.Log;
 import com.feng.p2planchat.client.LoginClient;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.contract.ILoginContract;
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.NetUtil;
 
@@ -78,6 +78,8 @@ public class LoginModel implements ILoginContract.Model {
 
                 //给每个在线用户发出请求
                 for (int i = 0; i < ipAddressList.size(); i++) {
+                    Log.d(TAG, "LoginClientThread:run run");
+
                     //注意：如果对方没有打开相应端口，会抛出IOException
                     Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
                     mUserNum++;
@@ -85,6 +87,10 @@ public class LoginModel implements ILoginContract.Model {
                     loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
                         @Override
                         public void getUserInfo(User user) {
+                            //这里没有回调？？？
+
+                            Log.d(TAG, "getUserInfo: run");
+                            Log.d(TAG, "getUserInfo: user = " + user.show());
                             mUserList.add(user);
                             mAtomicInteger.incrementAndGet();
                         }

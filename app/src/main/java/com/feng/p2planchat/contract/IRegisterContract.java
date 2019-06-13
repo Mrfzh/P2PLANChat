@@ -2,7 +2,7 @@ package com.feng.p2planchat.contract;
 
 import android.content.Context;
 
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 
 import java.util.List;
 

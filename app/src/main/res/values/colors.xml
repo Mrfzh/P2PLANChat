@@ -32,4 +32,14 @@
     <color name="color_tip_line">#cccccc</color>
     <color name="color_tip_bg">#f1f1f1</color>
 
+    <color name="color_user_list_title_bg">#e1e1e1</color>
+    <color name="color_user_list_title_text">#303030</color>
+    <color name="color_user_list_refresh_pressed">#bbbbbb</color>
+
+    <color name="color_item_user_name">#303030</color>
+    <color name="color_item_user_text">#999999</color>
+    <color name="color_item_user_time">#999999</color>
+    <color name="color_item_user_line">#cccccc</color>
+    <color name="color_item_layout_pressed">#bbbbbb</color>
+
 </resources>

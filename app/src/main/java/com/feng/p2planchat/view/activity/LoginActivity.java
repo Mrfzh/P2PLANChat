@@ -15,20 +15,19 @@ import android.widget.TextView;
 
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
-import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.ILoginContract;
 import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
-import com.feng.p2planchat.entity.User;
+import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.LoginPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
-import com.feng.p2planchat.view.test.TestActivity;
 import com.feng.p2planchat.widget.TipDialog;
 
 import java.util.List;
@@ -224,10 +223,22 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
     @Override
     public void loginSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+
+        if (mOwnInfo == null) {
+            Log.d(TAG, "mOwnInfo: null");
+        } else {
+            Log.d(TAG, "mOwnInfo: " + mOwnInfo.show());
+        }
+
         //发送在线用户信息给主活动
         Event<MainEvent> mainEvent = new Event<>(EventBusCode.LOGIN_2_MAIN,
                 new MainEvent(userList, mOwnInfo));
         EventBusUtil.sendStickyEvent(mainEvent);
+//        //发送在线用户信息给用户列表页面
+//        Event<UserListEvent> userListEvent = new Event<>(EventBusCode.LOGIN_2_USER_LIST,
+//                new UserListEvent(userList));
+//        EventBusUtil.sendStickyEvent(userListEvent);
+
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < userList.size(); i++) {
             User curr = userList.get(i);
@@ -241,6 +252,7 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
             builder.append("\n");
         }
         Log.d(TAG, "loginSuccess: " + builder.toString());
+
         //跳转到主活动
         jumpToNewActivity(MainActivity.class);
         finish();
