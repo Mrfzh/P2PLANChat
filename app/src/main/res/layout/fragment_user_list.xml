@@ -57,4 +57,13 @@
         android:background="@color/color_white_max"
         android:visibility="gone"/>
 
+    <ProgressBar
+        android:id="@+id/pb_user_list_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="@android:color/darker_gray"
+        android:visibility="gone" />
+
 </RelativeLayout>

@@ -2,6 +2,7 @@ package com.feng.p2planchat.entity.eventbus;
 
 import com.feng.p2planchat.entity.bean.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,9 +11,23 @@ import java.util.List;
  */
 public class UserListEvent {
     private List<User> userList;    //用户信息列表
+    private User ownInfo;       //自己的用户信息
+    private User newUser;       //新上线的用户
+    private boolean isOneUser;  //是否为更新一个用户信息
 
-    public UserListEvent(List<User> userList) {
+    private UserListEvent(List<User> userList, User ownInfo, User newUser, boolean isOneUser) {
         this.userList = userList;
+        this.ownInfo = ownInfo;
+        this.newUser = newUser;
+        this.isOneUser = isOneUser;
+    }
+
+    public UserListEvent(List<User> userList, User ownInfo) {
+        this(userList, ownInfo, null, false);
+    }
+
+    public UserListEvent(User newUser) {
+        this(new ArrayList<User>(), null, newUser, true);
     }
 
     public List<User> getUserList() {
@@ -21,5 +36,29 @@ public class UserListEvent {
 
     public void setUserList(List<User> userList) {
         this.userList = userList;
+    }
+
+    public User getNewUser() {
+        return newUser;
+    }
+
+    public void setNewUser(User newUser) {
+        this.newUser = newUser;
+    }
+
+    public boolean isOneUser() {
+        return isOneUser;
+    }
+
+    public void setOneUser(boolean oneUser) {
+        isOneUser = oneUser;
+    }
+
+    public User getOwnInfo() {
+        return ownInfo;
+    }
+
+    public void setOwnInfo(User ownInfo) {
+        this.ownInfo = ownInfo;
     }
 }

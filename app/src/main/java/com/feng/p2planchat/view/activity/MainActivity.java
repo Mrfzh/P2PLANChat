@@ -94,7 +94,7 @@ public class MainActivity extends BaseActivity {
     protected void initData() {
         //发送在线用户信息给用户列表页面
         Event<UserListEvent> userListEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST,
-                new UserListEvent(mUserList));
+                new UserListEvent(mUserList, mOwnInfo));
         EventBusUtil.sendStickyEvent(userListEvent);
 
         mFragmentList.add(new UserListFragment());
@@ -201,12 +201,17 @@ public class MainActivity extends BaseActivity {
                     service.setHandleLoginServiceListener(new HandleLoginService.HandleLoginServiceListener() {
                         @Override
                         public void getUserInfo(User user) {
-                            //添加新用户
-                            mUserList.add(user);
-                            //在主线程更新列表
-                            Message message = new Message();
-                            message.what = UPDATE_USER_LIST;
-                            mHandler.sendMessage(message);
+//                            //添加新用户
+//                            mUserList.add(user);
+//                            //在主线程通知用户列表界面更新列表
+//                            Message message = new Message();
+//                            message.what = UPDATE_USER_LIST;
+//                            mHandler.sendMessage(message);
+
+                            //通知用户列表有新用户上线
+                            Event<UserListEvent> userListEvent = new Event<>(
+                                    EventBusCode.MAIN_2_USER_LIST, new UserListEvent(user));
+                            EventBusUtil.sendEvent(userListEvent);
                         }
                     });
                     new Thread(service).start();
