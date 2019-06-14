@@ -76,6 +76,19 @@ public class AccountOperation {
     }
 
     /**
+     * 根据用户名，更新其对应的密码
+     *
+     * @param name 要修改密码的用户名
+     * @param newPassword 新密码
+     */
+    public void updatePasswordByName(String name, String newPassword) {
+        ContentValues values = new ContentValues();
+        values.put(Constant.KEY_PASSWORD, newPassword);
+        mDatabase.update(Constant.TABLE_ACCOUNT, values,
+                Constant.KEY_NAME + " like ? ", new String[]{name});
+    }
+
+    /**
      * 显示表中的所有数据
      *
      * @return 返回的HashMap：key为name，value为password

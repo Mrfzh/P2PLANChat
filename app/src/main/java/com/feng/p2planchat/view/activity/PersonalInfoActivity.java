@@ -20,6 +20,7 @@ import com.feng.p2planchat.entity.eventbus.UpdateHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateNameEvent;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.PictureUtil;
 import com.feng.p2planchat.util.UserUtil;
 
@@ -117,6 +118,13 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
                 break;
             case R.id.rv_personal_info_ip_address_layout:
                 //更新IP地址
+                String newIpAddress = IpAddressUtil.getIpAddress(this);
+                if (newIpAddress != null && !newIpAddress.equals(
+                        mIpAddressTv.getText().toString())) {
+                    //如果最新的IP地址和原来的不一样，则更新IP地址
+                    mIpAddressTv.setText(newIpAddress);
+                    showShortToast("更改为最新的IP地址");
+                }
                 break;
             case R.id.rv_personal_info_password_layout:
                 //修改密码
@@ -185,6 +193,8 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
         User user = UserUtil.readFromInternalStorage(this);
         user.setHeadImage(BitmapUtil.bitmap2ByteArray(mNewBitmap));
         UserUtil.write2InternalStorage(user, this);
+        //更新保存在本地的头像
+        BitmapUtil.save2InternalStorage(mNewBitmap, user.getUserName() + ".jpg", this);
 
         //更新当前页面的头像
         mHeadImageIv.setImageBitmap(mNewBitmap);
