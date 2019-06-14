@@ -58,7 +58,7 @@ public class ModifyNameModel implements IModifyNameContract.Model {
         UserUtil.write2InternalStorage(user, context);
 
         //更新个人界面和个人信息界面的用户名
-        Event<UpdateNameEvent> updateNameEvent = new Event<>(EventBusCode.MODIFY_NAME_2_UPDATE_NAME,
+        Event<UpdateNameEvent> updateNameEvent = new Event<>(EventBusCode.UPDATE_NAME,
                 new UpdateNameEvent(newName));
         EventBusUtil.sendEvent(updateNameEvent);
 

@@ -11,6 +11,7 @@ import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.entity.eventbus.UpdateHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateNameEvent;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.UserUtil;
@@ -36,12 +37,9 @@ public class PersonFragment extends BaseFragment implements View.OnClickListener
     private RelativeLayout mPersonalInfoRv;
     private RelativeLayout mLogoutRv;
 
-    private User mOwnInfo;      //自己的用户信息
-
     @Override
     protected void initData() {
-        //从本地获取用户信息
-        mOwnInfo = UserUtil.readFromInternalStorage(Objects.requireNonNull(getContext()));
+
     }
 
     @Override
@@ -61,9 +59,10 @@ public class PersonFragment extends BaseFragment implements View.OnClickListener
 
         mNameTv = getActivity().findViewById(R.id.tv_person_name);
 
-        if (mOwnInfo != null) {
-            mHeadImageIv.setImageBitmap(BitmapUtil.byteArray2Bitmap(mOwnInfo.getHeadImage()));
-            mNameTv.setText(mOwnInfo.getUserName());
+        User own = UserUtil.readFromInternalStorage(Objects.requireNonNull(getContext()));
+        if (own != null) {
+            mHeadImageIv.setImageBitmap(BitmapUtil.byteArray2Bitmap(own.getHeadImage()));
+            mNameTv.setText(own.getUserName());
         }
 
         mPersonalInfoRv = getActivity().findViewById(R.id.rv_person_personal_info_layout);
@@ -102,8 +101,19 @@ public class PersonFragment extends BaseFragment implements View.OnClickListener
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdateNameEventCome(Event<UpdateNameEvent> event) {
         switch (event.getCode()) {
-            case EventBusCode.MODIFY_NAME_2_UPDATE_NAME:
+            case EventBusCode.UPDATE_NAME:
                 mNameTv.setText(event.getData().getNewName());
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdateHeadImageEventCome(Event<UpdateHeadImageEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.UPDATE_HEAD_IMAGE:
+                mHeadImageIv.setImageBitmap(event.getData().getNewHeadImage());
                 break;
             default:
                 break;

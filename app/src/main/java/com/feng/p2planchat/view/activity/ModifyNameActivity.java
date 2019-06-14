@@ -27,7 +27,6 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
     private TextView mModifyTv;
     private ProgressBar mProgressBar;
 
-    private User mOwnInfo;
     private AccountOperation mAccountOperation;
 
     @Override
@@ -51,8 +50,6 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
                 Constant.DATABASE_ACCOUNT, null, 1);
         SQLiteDatabase db = helper.getWritableDatabase();
         mAccountOperation = new AccountOperation(db);
-
-        mOwnInfo = UserUtil.readFromInternalStorage(this);
     }
 
     @Override
@@ -128,7 +125,8 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
     private void modifyName(String newName) {
         newName = newName.replaceAll(" ", "");
         if (check(newName)) {
-            mPresenter.modifyName(mOwnInfo.getUserName(), newName, this);
+            mPresenter.modifyName(UserUtil.readFromInternalStorage(this).getUserName(),
+                    newName, this);
         } else {
             mProgressBar.setVisibility(View.GONE);
         }

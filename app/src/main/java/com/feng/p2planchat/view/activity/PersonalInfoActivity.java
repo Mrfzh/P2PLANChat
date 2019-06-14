@@ -1,5 +1,10 @@
 package com.feng.p2planchat.view.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -11,8 +16,11 @@ import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.eventbus.UpdateHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateNameEvent;
 import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.PictureUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -22,6 +30,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PersonalInfoActivity extends BaseActivity implements View.OnClickListener{
 
+    private static final int REQUEST_CHOOSE_PHOTO_FROM_ALBUM = 1;
+    
     private ImageView mBackIv;
     private CircleImageView mHeadImageIv;
     private RelativeLayout mNameRv;
@@ -30,7 +40,7 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
     private TextView mIpAddressTv;
     private RelativeLayout mPasswordRv;
 
-    private User mOwnInfo;
+    private Bitmap mNewBitmap;  //新头像的Bitmap
 
     @Override
     protected void doBeforeSetContentView() {
@@ -49,8 +59,7 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     protected void initData() {
-        //从本地获取用户信息
-        mOwnInfo = UserUtil.readFromInternalStorage(this);
+
     }
 
     @Override
@@ -74,10 +83,11 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
         mPasswordRv = findViewById(R.id.rv_personal_info_password_layout);
         mPasswordRv.setOnClickListener(this);
 
-        if (mOwnInfo != null) {
-            mNameTv.setText(mOwnInfo.getUserName());
-            mHeadImageIv.setImageBitmap(BitmapUtil.byteArray2Bitmap(mOwnInfo.getHeadImage()));
-            mIpAddressTv.setText(mOwnInfo.getIpAddress());
+        User own = UserUtil.readFromInternalStorage(this);
+        if (own != null) {
+            mNameTv.setText(own.getUserName());
+            mHeadImageIv.setImageBitmap(BitmapUtil.byteArray2Bitmap(own.getHeadImage()));
+            mIpAddressTv.setText(own.getIpAddress());
         }
     }
 
@@ -98,7 +108,8 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.iv_personal_info_head_image:
-                //编辑头像
+                //编辑头像：从相册中选择头像
+                chooseFromAlbum();
                 break;
             case R.id.rv_personal_info_name_layout:
                 //更改用户名
@@ -124,11 +135,63 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdateNameEventCome(Event<UpdateNameEvent> event) {
         switch (event.getCode()) {
-            case EventBusCode.MODIFY_NAME_2_UPDATE_NAME:
+            case EventBusCode.UPDATE_NAME:
                 mNameTv.setText(event.getData().getNewName());
                 break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 从相册中选择头像
+     */
+    private void chooseFromAlbum() {
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_CHOOSE_PHOTO_FROM_ALBUM);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHOOSE_PHOTO_FROM_ALBUM:
+                String imagePath;
+                if (resultCode == RESULT_OK) {
+                    //判断手机系统版本号，根据版本号对图片选中的图片进行操作
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        //4.4及以上版本
+                        assert data != null;
+                        imagePath = PictureUtil.handleImageOnKitKat(data, this);
+                    } else {
+                        assert data != null;
+                        imagePath = PictureUtil.handleImageBeforeKitKat(data, this);
+                    }
+                    mNewBitmap = BitmapFactory.decodeFile(imagePath);
+                    //更新头像
+                    updateHeadImage();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 更新头像
+     */
+    private void updateHeadImage() {
+        //更新本地用户信息
+        User user = UserUtil.readFromInternalStorage(this);
+        user.setHeadImage(BitmapUtil.bitmap2ByteArray(mNewBitmap));
+        UserUtil.write2InternalStorage(user, this);
+
+        //更新当前页面的头像
+        mHeadImageIv.setImageBitmap(mNewBitmap);
+
+        //更新个人页面的头像
+        Event<UpdateHeadImageEvent> updateHeadImageEvent = new Event<>(
+                EventBusCode.UPDATE_HEAD_IMAGE, new UpdateHeadImageEvent(mNewBitmap));
+        EventBusUtil.sendEvent(updateHeadImageEvent);
     }
 }

@@ -51,7 +51,7 @@ public class MainActivity extends BaseActivity {
     private List<String> mTabTitleList = new ArrayList<>();
 
     private List<User> mUserList = new ArrayList<>();   //在线用户列表
-    private User mOwnInfo;      //自己的用户信息
+//    private User mOwnInfo;      //自己的用户信息
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -93,8 +93,6 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        //从本地获取用户信息
-        mOwnInfo = UserUtil.readFromInternalStorage(this);
 
         //发送在线用户信息给用户列表页面
         Event<UserListEvent> userListEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST,
@@ -163,7 +161,7 @@ public class MainActivity extends BaseActivity {
         //打开服务器端，随时接收其他用户的登录信息
         new Thread(new LoginServiceThread()).start();
 
-        User curr = mOwnInfo;
+        User curr = UserUtil.readFromInternalStorage(this);
         String builder1 = null;
         if (curr != null) {
             builder1 = "用户名：" +
@@ -201,7 +199,8 @@ public class MainActivity extends BaseActivity {
                 while (true) {
                     Socket socket = userServerSocket.accept();
                     //处理客户端的请求
-                    HandleLoginService service = new HandleLoginService(socket, mOwnInfo);
+                    HandleLoginService service = new HandleLoginService(socket,
+                            UserUtil.readFromInternalStorage(MainActivity.this));
                     service.setHandleLoginServiceListener(new HandleLoginService.HandleLoginServiceListener() {
                         @Override
                         public void getUserInfo(User user) {

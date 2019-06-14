@@ -47,7 +47,6 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     private RecyclerView mListRv;
     private ProgressBar mProgressBar;
 
-    private User mOwnInfo;      //自己的用户信息
     private List<User> mUserList = new ArrayList<>();
     private List<UserData> mUserDataList = new ArrayList<>();
 
@@ -56,8 +55,6 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
 
     @Override
     protected void initData() {
-        //从本地获取用户信息
-        mOwnInfo = UserUtil.readFromInternalStorage(Objects.requireNonNull(getContext()));
 
         //初始化用户列表数据
         for (int i = 0; i < mUserList.size(); i++) {
@@ -207,7 +204,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
      * 重新发起请求，查找在线用户，并更新用户列表
      */
     private void refresh() {
-       mPresenter.findOtherUser(mOwnInfo, getContext());
+       mPresenter.findOtherUser(UserUtil.readFromInternalStorage(
+               Objects.requireNonNull(getContext())), getContext());
     }
 
     /**
