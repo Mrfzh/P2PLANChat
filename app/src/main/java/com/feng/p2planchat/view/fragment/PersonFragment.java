@@ -1,18 +1,47 @@
 package com.feng.p2planchat.view.fragment;
 
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseFragment;
 import com.feng.p2planchat.base.BasePresenter;
+import com.feng.p2planchat.config.EventBusCode;
+import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.entity.eventbus.UpdateNameEvent;
+import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.UserUtil;
+import com.feng.p2planchat.view.activity.PersonalInfoActivity;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * @author Feng Zhaohao
  * Created on 2019/6/9
  */
-public class PersonFragment extends BaseFragment {
+public class PersonFragment extends BaseFragment implements View.OnClickListener{
+
+    private static final String TAG = "fzh";
+
+    private CircleImageView mHeadImageIv;
+    private TextView mNameTv;
+    private RelativeLayout mPersonalInfoRv;
+    private RelativeLayout mLogoutRv;
+
+    private User mOwnInfo;      //自己的用户信息
 
     @Override
     protected void initData() {
-
+        //从本地获取用户信息
+        mOwnInfo = UserUtil.readFromInternalStorage(Objects.requireNonNull(getContext()));
     }
 
     @Override
@@ -27,11 +56,57 @@ public class PersonFragment extends BaseFragment {
 
     @Override
     protected void initView() {
+        mHeadImageIv = getActivity().findViewById(R.id.iv_person_head_image);
+        mHeadImageIv.setOnClickListener(this);
 
+        mNameTv = getActivity().findViewById(R.id.tv_person_name);
+
+        if (mOwnInfo != null) {
+            mHeadImageIv.setImageBitmap(BitmapUtil.byteArray2Bitmap(mOwnInfo.getHeadImage()));
+            mNameTv.setText(mOwnInfo.getUserName());
+        }
+
+        mPersonalInfoRv = getActivity().findViewById(R.id.rv_person_personal_info_layout);
+        mPersonalInfoRv.setOnClickListener(this);
+
+        mLogoutRv = getActivity().findViewById(R.id.rv_person_logout_layout);
+        mLogoutRv.setOnClickListener(this);
     }
 
     @Override
     protected BasePresenter getPresenter() {
         return null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_person_head_image:
+            case R.id.rv_person_personal_info_layout:
+                //进入个人信息页面
+                jump2Activity(PersonalInfoActivity.class);
+                break;
+            case R.id.rv_person_logout_layout:
+                //退出登录
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    protected boolean isRegisterEventBus() {
+        return true;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdateNameEventCome(Event<UpdateNameEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.MODIFY_NAME_2_UPDATE_NAME:
+                mNameTv.setText(event.getData().getNewName());
+                break;
+            default:
+                break;
+        }
     }
 }

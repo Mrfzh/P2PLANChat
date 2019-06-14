@@ -22,6 +22,7 @@ import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.UserListPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.UserUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -55,6 +56,9 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
 
     @Override
     protected void initData() {
+        //从本地获取用户信息
+        mOwnInfo = UserUtil.readFromInternalStorage(Objects.requireNonNull(getContext()));
+
         //初始化用户列表数据
         for (int i = 0; i < mUserList.size(); i++) {
             User currUser = mUserList.get(i);
@@ -142,8 +146,6 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                 if (!event.getData().isOneUser()) {
                     //其他用户列表
                     mUserList = event.getData().getUserList();
-                    //自己的用户信息
-                    mOwnInfo = event.getData().getOwnInfo();
                 }
                 break;
             default:

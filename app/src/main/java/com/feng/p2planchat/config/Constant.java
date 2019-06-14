@@ -23,4 +23,6 @@ public class Constant {
     public static final int [] MAIN_TAB_ICONS_AFTER_PRESSED = {R.drawable.user_list_after_pressed,
         R.drawable.person_after_pressed};
 
+    public static final String USER_FILE_NAME = "user.txt";     //该文件用于存储自己的用户信息
+
 }

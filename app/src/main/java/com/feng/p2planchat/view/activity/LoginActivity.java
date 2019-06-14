@@ -28,6 +28,7 @@ import com.feng.p2planchat.presenter.LoginPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
+import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.widget.TipDialog;
 
 import java.util.List;
@@ -230,9 +231,12 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
             Log.d(TAG, "mOwnInfo: " + mOwnInfo.show());
         }
 
+        //将自己的用户信息写入本地
+        UserUtil.write2InternalStorage(mOwnInfo, this);
+
         //发送在线用户信息给主活动
         Event<MainEvent> mainEvent = new Event<>(EventBusCode.LOGIN_2_MAIN,
-                new MainEvent(userList, mOwnInfo));
+                new MainEvent(userList));
         EventBusUtil.sendStickyEvent(mainEvent);
 //        //发送在线用户信息给用户列表页面
 //        Event<UserListEvent> userListEvent = new Event<>(EventBusCode.LOGIN_2_USER_LIST,

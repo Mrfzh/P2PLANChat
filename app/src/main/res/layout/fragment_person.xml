@@ -1,15 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_white_max"
     android:clickable="true">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_person_head_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/head_image2"
+        app:civ_border_width="3dp"
+        app:civ_border_color="@color/color_person_head_image_border"/>
+
     <TextView
+        android:id="@+id/tv_person_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="个人信息界面"
-        android:textSize="18sp"
-        android:layout_centerInParent="true"/>
+        android:text="大黄"
+        android:textColor="@color/color_person_name"
+        android:textSize="16sp"
+        android:layout_below="@id/iv_person_head_image"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"/>
+
+    <View
+        android:id="@+id/v_person_line_one"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/tv_person_name"
+        android:layout_marginTop="50dp"
+        android:background="@color/color_person_line"/>
+
+    <RelativeLayout
+        android:id="@+id/rv_person_personal_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/v_person_line_one"
+        android:background="@drawable/selector_person_item"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="个人信息"
+            android:textSize="16sp"
+            android:textColor="@color/color_person_item_text"
+            android:layout_centerInParent="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/enter_person_item"/>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/v_person_line_two"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/rv_person_personal_info_layout"
+        android:background="@color/color_person_line"/>
+
+    <RelativeLayout
+        android:id="@+id/rv_person_logout_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/v_person_line_two"
+        android:background="@drawable/selector_person_item"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="退出登录"
+            android:textSize="16sp"
+            android:textColor="@color/color_person_item_text"
+            android:layout_centerInParent="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/enter_person_item"/>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/v_person_line_three"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/rv_person_logout_layout"
+        android:background="@color/color_person_line"/>
 
 </RelativeLayout>

@@ -66,6 +66,16 @@ public class AccountOperation {
     }
 
     /**
+     * 根据用户名删除对应行
+     *
+     * @param name
+     */
+    public void deleteByName(String name) {
+        mDatabase.delete(Constant.TABLE_ACCOUNT, Constant.KEY_NAME + " like ? ",
+                new String[]{name});
+    }
+
+    /**
      * 显示表中的所有数据
      *
      * @return 返回的HashMap：key为name，value为password

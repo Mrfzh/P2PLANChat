@@ -8,6 +8,8 @@
     <color name="color_main_dark">#43A047</color>
     <color name="color_white_max">#ffffff</color>
 
+    <color name="color_back_pressed">#bbbbbb</color>
+
     <color name="color_login_line">#dddddd</color>
     <color name="color_login_bg">#ffffff</color>
     <color name="color_login_main_bg">#eeeeee</color>
@@ -18,7 +20,6 @@
     <color name="color_register_main_bg">#eeeeee</color>
     <color name="color_register_title_bar_bg">#e1e1e1</color>
     <color name="color_register_title_text">#303030</color>
-    <color name="color_register_title_back_pressed">#bbbbbb</color>
     <color name="color_register_line">#cccccc</color>
     <color name="color_register_head_image_border">#999999</color>
     <color name="color_register_text">#f1f1f1</color>
@@ -41,5 +42,27 @@
     <color name="color_item_user_time">#999999</color>
     <color name="color_item_user_line">#cccccc</color>
     <color name="color_item_layout_pressed">#bbbbbb</color>
+
+    <color name="color_person_head_image_border">#555555</color>
+    <color name="color_person_name">#303030</color>
+    <color name="color_person_line">#cccccc</color>
+    <color name="color_person_item_pressed">#dddddd</color>
+    <color name="color_person_item_text">#303030</color>
+
+    <color name="color_personal_info_title_bg">#e1e1e1</color>
+    <color name="color_personal_info_title_text">#303030</color>
+    <color name="color_personal_info_head_image_border">#555555</color>
+    <color name="color_personal_info_line">#cccccc</color>
+    <color name="color_personal_info_item_pressed">#dddddd</color>
+    <color name="color_personal_info_name">#bbbbbb</color>
+    <color name="color_personal_info_text_light">#bbbbbb</color>
+
+    <color name="color_modify_name_title_bg">#e1e1e1</color>
+    <color name="color_modify_name_title_text">#303030</color>
+    <color name="color_modify_name_text">#f1f1f1</color>
+
+    <color name="color_modify_password_title_bg">#e1e1e1</color>
+    <color name="color_modify_password_title_text">#303030</color>
+    <color name="color_modify_password_text">#f1f1f1</color>
 
 </resources>

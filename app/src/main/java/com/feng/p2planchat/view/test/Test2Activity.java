@@ -28,6 +28,7 @@ import com.feng.p2planchat.service.HandleLoginService;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.PictureUtil;
+import com.feng.p2planchat.util.UserUtil;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -52,6 +53,7 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
     private Button mBytesAndBitmapBtn;
     private Button mSavePictureBtn;
     private Button mLoadPictureBtn;
+    private Button mReadOwnInfoBtn;
 
     private String mImagePath;  //选择的图片路径
     private Bitmap mBitmap;     //选中图片的bitmap
@@ -103,6 +105,9 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
         mOwnBitmap = BitmapUtil.getBitmapByResId("head_image" + seed, this);
         assert mOwnBitmap != null;
         mOwnPicBytes = BitmapUtil.bitmap2ByteArray(mOwnBitmap);
+
+        User user = new User("自定义IP地址", "自定义用户名", mOwnPicBytes);
+        UserUtil.write2InternalStorage(user, this);
     }
 
     @Override
@@ -122,6 +127,8 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
         mSavePictureBtn.setOnClickListener(this);
         mLoadPictureBtn = findViewById(R.id.btn_test2_load_picture);
         mLoadPictureBtn.setOnClickListener(this);
+        mReadOwnInfoBtn = findViewById(R.id.btn_test2_read_own_info);
+        mReadOwnInfoBtn.setOnClickListener(this);
     }
 
     @Override
@@ -172,6 +179,18 @@ public class Test2Activity extends BaseActivity implements View.OnClickListener{
                 //从内部存储加载图片
                 Bitmap bitmap1 = BitmapUtil.readFromInternalStorage("测试1.jpg", this);
                 mPictureIv.setImageBitmap(bitmap1);
+                break;
+            case R.id.btn_test2_read_own_info:
+                //从本地读取自己的用户信息
+                User user = UserUtil.readFromInternalStorage(this);
+                if (user == null) {
+                    Log.d(TAG, "onClick: user = null");
+                } else {
+                    Log.d(TAG, "onClick: 用户名 = " + user.getUserName());
+                    Log.d(TAG, "onClick: IP地址 = " + user.getIpAddress());
+                    mPictureIv.setImageBitmap(BitmapUtil.byteArray2Bitmap(user.getHeadImage()));
+                }
+
                 break;
             default:
                 break;

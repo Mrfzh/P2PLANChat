@@ -25,6 +25,7 @@ import com.feng.p2planchat.entity.eventbus.MainEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.service.HandleLoginService;
 import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.view.fragment.PersonFragment;
 import com.feng.p2planchat.view.fragment.UserListFragment;
 
@@ -92,9 +93,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        //从本地获取用户信息
+        mOwnInfo = UserUtil.readFromInternalStorage(this);
+
         //发送在线用户信息给用户列表页面
         Event<UserListEvent> userListEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST,
-                new UserListEvent(mUserList, mOwnInfo));
+                new UserListEvent(mUserList));
         EventBusUtil.sendStickyEvent(userListEvent);
 
         mFragmentList.add(new UserListFragment());
@@ -245,8 +249,6 @@ public class MainActivity extends BaseActivity {
         switch (event.getCode()) {
             case EventBusCode.LOGIN_2_MAIN:
             case EventBusCode.REGISTER_2_MAIN:
-                Log.d(TAG, "onEventCone: run");
-                mOwnInfo = event.getData().getOwnInfo();
                 mUserList = event.getData().getUserList();
                 break;
             default:

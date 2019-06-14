@@ -16,12 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".view.test.Test2Activity">
-
-        </activity>
-        <activity android:name=".view.activity.MainActivity">
-
-        </activity>
+        <activity android:name=".view.activity.ModifyPasswordActivity"></activity>
+        <activity android:name=".view.activity.ModifyNameActivity" />
+        <activity android:name=".view.activity.PersonalInfoActivity" />
+        <activity android:name=".view.test.Test2Activity" />
+        <activity android:name=".view.activity.MainActivity" />
         <activity android:name=".view.activity.RegisterActivity" />
         <activity android:name=".view.activity.LoginActivity">
             <intent-filter>
@@ -30,9 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.test.TestActivity">
-
-        </activity>
+        <activity android:name=".view.test.TestActivity" />
     </application>
 
 </manifest>

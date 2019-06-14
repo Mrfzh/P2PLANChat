@@ -11,23 +11,21 @@ import java.util.List;
  */
 public class UserListEvent {
     private List<User> userList;    //用户信息列表
-    private User ownInfo;       //自己的用户信息
     private User newUser;       //新上线的用户
     private boolean isOneUser;  //是否为更新一个用户信息
 
-    private UserListEvent(List<User> userList, User ownInfo, User newUser, boolean isOneUser) {
+    private UserListEvent(List<User> userList, User newUser, boolean isOneUser) {
         this.userList = userList;
-        this.ownInfo = ownInfo;
         this.newUser = newUser;
         this.isOneUser = isOneUser;
     }
 
-    public UserListEvent(List<User> userList, User ownInfo) {
-        this(userList, ownInfo, null, false);
+    public UserListEvent(List<User> userList) {
+        this(userList, null, false);
     }
 
     public UserListEvent(User newUser) {
-        this(new ArrayList<User>(), null, newUser, true);
+        this(new ArrayList<User>(), newUser, true);
     }
 
     public List<User> getUserList() {
@@ -54,11 +52,4 @@ public class UserListEvent {
         isOneUser = oneUser;
     }
 
-    public User getOwnInfo() {
-        return ownInfo;
-    }
-
-    public void setOwnInfo(User ownInfo) {
-        this.ownInfo = ownInfo;
-    }
 }
