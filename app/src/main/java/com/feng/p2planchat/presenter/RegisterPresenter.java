@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.contract.IRegisterContract;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.model.RegisterModel;
 
 import java.util.List;

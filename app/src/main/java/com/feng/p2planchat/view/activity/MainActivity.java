@@ -19,11 +19,16 @@ import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
+import com.feng.p2planchat.entity.serializable.UpdateUser;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
+import com.feng.p2planchat.entity.eventbus.UpdateOtherHeadImageEvent;
+import com.feng.p2planchat.entity.eventbus.UpdateOtherNameEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.service.HandleLoginService;
+import com.feng.p2planchat.service.HandleUpdateService;
+import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.view.fragment.PersonFragment;
@@ -161,6 +166,9 @@ public class MainActivity extends BaseActivity {
         //打开服务器端，随时接收其他用户的登录信息
         new Thread(new LoginServiceThread()).start();
 
+        //打开服务器端，随机接收其他用户的信息更新
+        new Thread(new UpdateServiceThread()).start();
+
         User curr = UserUtil.readFromInternalStorage(this);
         String builder1 = null;
         if (curr != null) {
@@ -204,13 +212,6 @@ public class MainActivity extends BaseActivity {
                     service.setHandleLoginServiceListener(new HandleLoginService.HandleLoginServiceListener() {
                         @Override
                         public void getUserInfo(User user) {
-//                            //添加新用户
-//                            mUserList.add(user);
-//                            //在主线程通知用户列表界面更新列表
-//                            Message message = new Message();
-//                            message.what = UPDATE_USER_LIST;
-//                            mHandler.sendMessage(message);
-
                             //通知用户列表有新用户上线
                             Event<UserListEvent> userListEvent = new Event<>(
                                     EventBusCode.MAIN_2_USER_LIST, new UserListEvent(user));
@@ -221,6 +222,53 @@ public class MainActivity extends BaseActivity {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    class UpdateServiceThread implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                //作为服务端，监听其他用户的登录信息
+                ServerSocket updateServerSocket = new ServerSocket(Constant.UPDATE_PORT);
+
+                //一直监听客户端
+                while (true) {
+                    Socket socket = updateServerSocket.accept();
+                    //处理客户端的请求
+                    HandleUpdateService service = new HandleUpdateService(socket);
+                    Log.d(TAG, "UpdateServiceThread: run");
+                    service.setHandleUpdateServiceListener(new HandleUpdateService.HandleUpdateServiceListener() {
+                        @Override
+                        public void getUpdateUserInfo(UpdateUser updateUser) {
+                            //通知用户列表界面更新相关信息
+                            switch (updateUser.getUpdateWhat()) {
+                                case Constant.UPDATE_USER_NAME:
+                                    //更新用户名
+                                    Event<UpdateOtherNameEvent> updateOtherNameEvent = new Event<>(
+                                            EventBusCode.UPDATE_OTHER_NAME, new UpdateOtherNameEvent(
+                                                    updateUser.getOldName(), updateUser.getNewName()));
+                                    EventBusUtil.sendEvent(updateOtherNameEvent);
+                                    break;
+                                case Constant.UPDATE_HEAD_IMAGE:
+                                    //更新头像
+                                    Event<UpdateOtherHeadImageEvent> updateOtherHeadImageEvent = new Event<>(
+                                            EventBusCode.UPDATE_OTHER_HEAD_IMAGE, new UpdateOtherHeadImageEvent(
+                                            updateUser.getOldName(), BitmapUtil.byteArray2Bitmap(updateUser.getNewHeadImage())));
+                                    EventBusUtil.sendEvent(updateOtherHeadImageEvent);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    });
+
+                    new Thread(service).start();
+                }
+            } catch (IOException e) {
+                Log.d(TAG, "UpdateServiceThread.IOException: " + e.toString());
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.feng.p2planchat.entity.eventbus;
 
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
 
 import java.util.List;
 

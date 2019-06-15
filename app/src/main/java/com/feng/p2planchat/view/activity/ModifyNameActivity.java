@@ -10,17 +10,18 @@ import android.widget.TextView;
 
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
-import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.contract.IModifyNameContract;
 import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
-import com.feng.p2planchat.entity.bean.User;
 import com.feng.p2planchat.presenter.ModifyNamePresenter;
+import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
         implements View.OnClickListener, IModifyNameContract.View {
+
+    public static final String TAG = "fzh";
 
     private ImageView mBackIv;
     private EditText mNewNameEt;
@@ -89,7 +90,7 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
                     public void run() {
                         modifyName(mNewNameEt.getText().toString());
                     }
-                }, 300);
+                }, 1000);
                 break;
             default:
                 break;
@@ -115,6 +116,7 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
     public void modifyNameError(String errorMsg) {
         mProgressBar.setVisibility(View.GONE);
         showShortToast(errorMsg);
+        finish();
     }
 
     /**
@@ -125,8 +127,8 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
     private void modifyName(String newName) {
         newName = newName.replaceAll(" ", "");
         if (check(newName)) {
-            mPresenter.modifyName(UserUtil.readFromInternalStorage(this).getUserName(),
-                    newName, this);
+            mPresenter.modifyName(OtherUserIpUtil.readFromInternalStorage(this).getOtherUserIpList(),
+                    UserUtil.readFromInternalStorage(this).getUserName(), newName, this);
         } else {
             mProgressBar.setVisibility(View.GONE);
         }

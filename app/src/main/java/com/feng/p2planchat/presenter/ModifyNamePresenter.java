@@ -6,6 +6,8 @@ import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.contract.IModifyNameContract;
 import com.feng.p2planchat.model.ModifyNameModel;
 
+import java.util.List;
+
 /**
  * @author Feng Zhaohao
  * Created on 2019/6/14
@@ -34,7 +36,8 @@ public class ModifyNamePresenter extends BasePresenter<IModifyNameContract.View>
     }
 
     @Override
-    public void modifyName(String oldName, String newName, Context context) {
-        mModel.modifyName(oldName, newName, context);
+    public void modifyName(List<String> otherUserIpList, String oldName,
+                           String newName, Context context) {
+        mModel.modifyName(otherUserIpList, oldName, newName, context);
     }
 }

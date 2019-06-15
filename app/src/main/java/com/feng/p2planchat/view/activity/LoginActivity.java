@@ -20,17 +20,19 @@ import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.ILoginContract;
 import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
+import com.feng.p2planchat.entity.serializable.OtherUserIp;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
-import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.LoginPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
+import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.widget.TipDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -231,6 +233,17 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
             Log.d(TAG, "mOwnInfo: " + mOwnInfo.show());
         }
 
+        //将其他用户的IP地址写入本地
+        List<String> otherUserIpList = new ArrayList<>();
+        for (int i = 0; i < userList.size(); i++) {
+            User curr = userList.get(i);
+            if (curr == null) {
+                continue;
+            }
+            otherUserIpList.add(curr.getIpAddress());
+        }
+        OtherUserIpUtil.write2InternalStorage(new OtherUserIp(otherUserIpList), this);
+
         //将自己的用户信息写入本地
         UserUtil.write2InternalStorage(mOwnInfo, this);
 
@@ -245,14 +258,14 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < userList.size(); i++) {
-            User curr = userList.get(i);
-            if (curr == null) {
+            User curr1 = userList.get(i);
+            if (curr1 == null) {
                 continue;
             }
             builder.append("用户名：");
-            builder.append(curr.getUserName());
+            builder.append(curr1.getUserName());
             builder.append(", 用户IP地址：");
-            builder.append(curr.getIpAddress());
+            builder.append(curr1.getIpAddress());
             builder.append("\n");
         }
         Log.d(TAG, "loginSuccess: " + builder.toString());

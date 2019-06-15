@@ -3,7 +3,7 @@ package com.feng.p2planchat.util;
 import android.content.Context;
 
 import com.feng.p2planchat.config.Constant;
-import com.feng.p2planchat.entity.serializable.User;
+import com.feng.p2planchat.entity.serializable.OtherUserIp;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,23 +13,22 @@ import java.io.ObjectOutputStream;
 
 /**
  * @author Feng Zhaohao
- * Created on 2019/6/14
+ * Created on 2019/6/15
  */
-public class UserUtil {
+public class OtherUserIpUtil {
+
     /**
-     * 将自己的用户信息写入到本地
-     *
-     * @param user
+     * 将其他在线用户的IP地址写入到本地
      */
-    public static void write2InternalStorage(User user, Context context) {
-        if (user == null) {
+    public static void write2InternalStorage(OtherUserIp otherUserIp, Context context) {
+        if (otherUserIp == null) {
             return;
         }
         FileOutputStream fos = null;
         try {
-            fos = context.openFileOutput(Constant.USER_FILE_NAME, Context.MODE_PRIVATE);
+            fos = context.openFileOutput(Constant.OTHER_USER_IP_FILE_NAME, Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(user);
+            oos.writeObject(otherUserIp);
             oos.flush();
             oos.close();
         } catch (IOException e) {
@@ -46,18 +45,18 @@ public class UserUtil {
     }
 
     /**
-     * 从本地读取自己的用户信息
+     * 从本地读取其他在线用户的IP地址
      *
      * @param context
      * @return
      */
-    public static User readFromInternalStorage(Context context) {
+    public static OtherUserIp readFromInternalStorage(Context context) {
         FileInputStream fis = null;
-        User user = null;
+        OtherUserIp otherUserIp = null;
         try {
-            fis = context.openFileInput(Constant.USER_FILE_NAME);
+            fis = context.openFileInput(Constant.OTHER_USER_IP_FILE_NAME);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            user = (User) ois.readObject();
+            otherUserIp = (OtherUserIp) ois.readObject();
             ois.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +72,6 @@ public class UserUtil {
             }
         }
 
-        return user;
+        return otherUserIp;
     }
-
 }

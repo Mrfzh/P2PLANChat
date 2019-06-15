@@ -21,17 +21,19 @@ import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IRegisterContract;
 import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
+import com.feng.p2planchat.entity.serializable.OtherUserIp;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
-import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.RegisterPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
+import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.PictureUtil;
 import com.feng.p2planchat.util.UserUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RegisterActivity extends BaseActivity<RegisterPresenter>
@@ -216,6 +218,17 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
     @Override
     public void registerSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+
+        //将其他用户的IP地址写入本地
+        List<String> otherUserIpList = new ArrayList<>();
+        for (int i = 0; i < userList.size(); i++) {
+            User curr = userList.get(i);
+            if (curr == null) {
+                continue;
+            }
+            otherUserIpList.add(curr.getIpAddress());
+        }
+        OtherUserIpUtil.write2InternalStorage(new OtherUserIp(otherUserIpList), this);
 
         //将自己的用户信息写入本地
         UserUtil.write2InternalStorage(mOwnInfo, this);

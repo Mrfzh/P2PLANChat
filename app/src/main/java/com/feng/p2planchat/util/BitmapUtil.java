@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Log;
 
 import com.feng.p2planchat.R;
 
@@ -83,14 +84,17 @@ public class BitmapUtil {
      */
     public static void save2InternalStorage(Bitmap bitmap, String name, Context context) {
         if (bitmap == null) {
+            Log.d(TAG, "save2InternalStorage: bitmap = null");
             return;
         }
         FileOutputStream fos = null;
         try {
             fos = context.openFileOutput(name, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            Log.d(TAG, "save2InternalStorage: run");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            Log.d(TAG, "FileNotFoundException: " + e.toString());
         } finally {
             try {
                 if (fos != null) {
@@ -98,6 +102,7 @@ public class BitmapUtil {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.d(TAG, "IOException: " + e.toString());
             }
         }
     }

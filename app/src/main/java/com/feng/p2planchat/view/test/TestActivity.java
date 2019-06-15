@@ -13,7 +13,7 @@ import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.client.LoginClient;
 import com.feng.p2planchat.config.Constant;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.service.HandleLoginService;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.NetUtil;

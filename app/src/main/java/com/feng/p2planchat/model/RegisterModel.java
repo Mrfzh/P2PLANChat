@@ -6,7 +6,7 @@ import android.util.Log;
 import com.feng.p2planchat.client.LoginClient;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.contract.IRegisterContract;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.NetUtil;
 

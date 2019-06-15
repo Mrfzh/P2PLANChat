@@ -1,4 +1,4 @@
-package com.feng.p2planchat.entity.bean;
+package com.feng.p2planchat.entity.serializable;
 
 import java.io.Serializable;
 

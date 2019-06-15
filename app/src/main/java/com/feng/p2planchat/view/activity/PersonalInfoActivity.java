@@ -14,7 +14,7 @@ import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.EventBusCode;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.UpdateHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateNameEvent;

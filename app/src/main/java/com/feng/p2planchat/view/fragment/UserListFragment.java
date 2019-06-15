@@ -13,21 +13,23 @@ import android.widget.TextView;
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.adapter.UserAdapter;
 import com.feng.p2planchat.base.BaseFragment;
-import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IUserListContract;
-import com.feng.p2planchat.entity.bean.User;
+import com.feng.p2planchat.entity.serializable.User;
+import com.feng.p2planchat.entity.serializable.OtherUserIp;
 import com.feng.p2planchat.entity.data.UserData;
 import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.eventbus.UpdateOtherHeadImageEvent;
+import com.feng.p2planchat.entity.eventbus.UpdateOtherNameEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.UserListPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -134,10 +136,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onStickyEventBusCome(Event<UserListEvent> event) {
-        Log.d(TAG, "onStickyEventBusCome(userlist): run");
-        Log.d(TAG, "onStickyEventBusCome(userlist): event.getCode() = " + event.getCode());
-        Log.d(TAG, "onStickyEventBusCome(userlist): event.getData() = " + event.getData());
+    public void onStickyUserListEventCome(Event<UserListEvent> event) {
         switch (event.getCode()) {
             case EventBusCode.MAIN_2_USER_LIST:
                 if (!event.getData().isOneUser()) {
@@ -151,16 +150,53 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventBusCome(Event<UserListEvent> event) {
-        Log.d(TAG, "onEventBusCome(userlist): run");
-        Log.d(TAG, "onEventBusCome(userlist): event.getCode() = " + event.getCode());
-        Log.d(TAG, "onEventBusCome(userlist): event.getData() = " + event.getData());
+    public void onUserListEventCome(Event<UserListEvent> event) {
         switch (event.getCode()) {
             case EventBusCode.MAIN_2_USER_LIST:
                 if (event.getData().isOneUser()) {
                     //有新用户上线
                     hasNewUser(event.getData().getNewUser());
                 }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdateOtherNameEventCome(Event<UpdateOtherNameEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.UPDATE_OTHER_NAME:
+                //更新在线用户的用户名
+                String oldName = event.getData().getOldName();
+                for (int i = 0; i < mUserDataList.size(); i++) {
+                    UserData curr = mUserDataList.get(i);
+                    if (curr.getName().equals(oldName)) {
+                        curr.setName(event.getData().getNewName());
+                        break;
+                    }
+                }
+                mUserAdapter.notifyDataSetChanged();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdateOtherHeadImageEventCome(Event<UpdateOtherHeadImageEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.UPDATE_OTHER_HEAD_IMAGE:
+                //更新在线用户的头像
+                String oldName = event.getData().getOldName();
+                for (int i = 0; i < mUserDataList.size(); i++) {
+                    UserData curr = mUserDataList.get(i);
+                    if (curr.getName().equals(oldName)) {
+                        curr.setHeadImage(event.getData().getNewHeadImage());
+                        break;
+                    }
+                }
+                mUserAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -197,6 +233,12 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             mNothingTv.setVisibility(View.GONE);
             //添加到用户名集合中
             mUserNameSet.add(name);
+
+            //将新用户的IP地址写入本地
+            List<String> otherUserIpList = OtherUserIpUtil
+                    .readFromInternalStorage(getContext()).getOtherUserIpList();
+            otherUserIpList.add(user.getIpAddress());
+            OtherUserIpUtil.write2InternalStorage(new OtherUserIp(otherUserIpList), getContext());
         }
     }
 
@@ -216,6 +258,18 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     @Override
     public void findOtherUserSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+
+        //将其他用户的IP地址写入本地
+        List<String> otherUserIpList = new ArrayList<>();
+        for (int i = 0; i < userList.size(); i++) {
+            User curr = userList.get(i);
+            if (curr == null) {
+                continue;
+            }
+            otherUserIpList.add(curr.getIpAddress());
+        }
+        OtherUserIpUtil.write2InternalStorage(new OtherUserIp(otherUserIpList), getContext());
+
         //将不在列表的用户添加进列表
         for (int i = 0; i < userList.size(); i++) {
             User curr = userList.get(i);
@@ -230,6 +284,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                 mUserNameSet.add(name);
             }
         }
+
         //更新用户列表
         mUserAdapter.notifyDataSetChanged();
         //隐藏掉无人页面
