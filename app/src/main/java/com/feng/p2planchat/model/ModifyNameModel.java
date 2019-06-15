@@ -38,7 +38,6 @@ public class ModifyNameModel implements IModifyNameContract.Model {
     private AccountOperation mAccountOperation;
 
     private UpdateUser mUpdateInfo;
-    private Context mContext;
     private List<String> mOtherUserIpList = new ArrayList<>();
 
     public ModifyNameModel(IModifyNameContract.Presenter mPresenter) {
@@ -99,7 +98,6 @@ public class ModifyNameModel implements IModifyNameContract.Model {
         //作为客户端，向其他在线用户发出广播
         mOtherUserIpList = otherUserIpList;
         mUpdateInfo = new UpdateUser(oldName, newName);
-        mContext = context;
         new Thread(new UpdateClientThread()).start();
 
     }

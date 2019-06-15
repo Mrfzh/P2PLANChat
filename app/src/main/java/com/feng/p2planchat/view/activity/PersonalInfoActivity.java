@@ -14,13 +14,16 @@ import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.EventBusCode;
+import com.feng.p2planchat.contract.IPersonalInfoContract;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.entity.eventbus.UpdateHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateNameEvent;
+import com.feng.p2planchat.presenter.PersonalInfoPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
+import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.PictureUtil;
 import com.feng.p2planchat.util.UserUtil;
 
@@ -29,7 +32,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class PersonalInfoActivity extends BaseActivity implements View.OnClickListener{
+public class PersonalInfoActivity extends BaseActivity<PersonalInfoPresenter>
+        implements View.OnClickListener, IPersonalInfoContract.View {
 
     private static final int REQUEST_CHOOSE_PHOTO_FROM_ALBUM = 1;
     
@@ -54,8 +58,8 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
     }
 
     @Override
-    protected BasePresenter getPresenter() {
-        return null;
+    protected PersonalInfoPresenter getPresenter() {
+        return new PersonalInfoPresenter();
     }
 
     @Override
@@ -176,7 +180,6 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
                         imagePath = PictureUtil.handleImageBeforeKitKat(data, this);
                     }
                     mNewBitmap = BitmapFactory.decodeFile(imagePath);
-                    //更新头像
                     updateHeadImage();
                 }
                 break;
@@ -203,5 +206,27 @@ public class PersonalInfoActivity extends BaseActivity implements View.OnClickLi
         Event<UpdateHeadImageEvent> updateHeadImageEvent = new Event<>(
                 EventBusCode.UPDATE_HEAD_IMAGE, new UpdateHeadImageEvent(mNewBitmap));
         EventBusUtil.sendEvent(updateHeadImageEvent);
+
+        //通知其他用户更新头像
+        mPresenter.modifyHeadImage(OtherUserIpUtil.readFromInternalStorage(this).getOtherUserIpList(),
+                UserUtil.readFromInternalStorage(this).getUserName(), mNewBitmap, this);
+    }
+
+    /**
+     * 编辑头像成功
+     */
+    @Override
+    public void modifyHeadImageSuccess() {
+
+    }
+
+    /**
+     * 编辑头像失败
+     *
+     * @param errorMsg
+     */
+    @Override
+    public void modifyHeadImageError(String errorMsg) {
+        showShortToast(errorMsg);
     }
 }
