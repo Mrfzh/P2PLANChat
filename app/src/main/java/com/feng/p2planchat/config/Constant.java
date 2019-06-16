@@ -30,4 +30,5 @@ public class Constant {
     //更新某种用户信息
     public static final int UPDATE_USER_NAME = 1;
     public static final int UPDATE_HEAD_IMAGE = 2;
+
 }

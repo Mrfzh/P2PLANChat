@@ -65,4 +65,13 @@
     <color name="color_modify_password_title_text">#303030</color>
     <color name="color_modify_password_text">#f1f1f1</color>
 
+    <color name="color_chat_bg">#eeeeee</color>
+    <color name="color_chat_text">#111111</color>
+    <color name="color_chat_title_bar_bg">#eeeeee</color>
+    <color name="color_chat_title_text">#303030</color>
+    <color name="color_chat_bottom_bar_bg">#f6f6f6</color>
+    <color name="color_chat_bottom_bar_top_line">#dddddd</color>
+    <color name="color_chat_input_bg">#ffffff</color>
+    <color name="color_chat_text_send">#f1f1f1</color>
+
 </resources>
