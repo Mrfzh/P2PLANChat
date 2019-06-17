@@ -2,15 +2,15 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/color_main_dark" />
-            <corners android:radius="5dp" />
+            <corners android:radius="10dp" />
+            <solid android:color="@color/color_chat_more_function_image_bg_after_pressed" />
         </shape>
     </item>
 
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/color_main" />
-            <corners android:radius="5dp" />
+            <corners android:radius="10dp" />
+            <solid android:color="@color/color_chat_more_function_image_bg_before_pressed" />
         </shape>
     </item>
 </selector>

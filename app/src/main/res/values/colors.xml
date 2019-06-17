@@ -71,7 +71,11 @@
     <color name="color_chat_title_text">#303030</color>
     <color name="color_chat_bottom_bar_bg">#f6f6f6</color>
     <color name="color_chat_bottom_bar_top_line">#dddddd</color>
-    <color name="color_chat_input_bg">#ffffff</color>
+    <color name="color_chat_input_bg">#fcfcfc</color>
     <color name="color_chat_text_send">#f1f1f1</color>
+    <color name="color_chat_more_function_bg">#f6f6f6</color>
+    <color name="color_chat_more_function_top_line">#dddddd</color>
+    <color name="color_chat_more_function_image_bg_before_pressed">#fcfcfc</color>
+    <color name="color_chat_more_function_image_bg_after_pressed">#e1e1e1</color>
 
 </resources>

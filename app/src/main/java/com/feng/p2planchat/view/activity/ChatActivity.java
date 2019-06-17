@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.adapter.ChatAdapter;
@@ -14,9 +17,13 @@ import com.feng.p2planchat.entity.data.ChatData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatActivity extends BaseActivity {
+public class ChatActivity extends BaseActivity implements View.OnClickListener{
 
     private RecyclerView mChatRv;
+    private RelativeLayout mBottomBarRv;
+    private RelativeLayout mMoreFunctionRv;
+    private ImageView mMoreFunctionIv;
+    private ImageView mBackIv;
 
     private List<ChatData> mChatDataList = new ArrayList<>();
 
@@ -53,6 +60,14 @@ public class ChatActivity extends BaseActivity {
         mChatRv.setLayoutManager(new LinearLayoutManager(this));
         initAdapter();
         mChatRv.setAdapter(mChatAdapter);
+
+        mBottomBarRv = findViewById(R.id.rv_chat_bottom_bar);
+        mMoreFunctionRv = findViewById(R.id.rv_chat_more_function);
+
+        mMoreFunctionIv = findViewById(R.id.iv_chat_more_function);
+        mMoreFunctionIv.setOnClickListener(this);
+        mBackIv = findViewById(R.id.iv_chat_back);
+        mBackIv.setOnClickListener(this);
     }
 
     @Override
@@ -70,5 +85,17 @@ public class ChatActivity extends BaseActivity {
      */
     private void initAdapter() {
         mChatAdapter = new ChatAdapter(this, mChatDataList);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_chat_more_function:
+                break;
+            case R.id.iv_chat_back:
+                break;
+            default:
+                break;
+        }
     }
 }

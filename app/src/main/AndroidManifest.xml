@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".view.test.Test3Activity">
+
+        </activity>
         <activity android:name=".view.activity.ChatActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,9 +32,7 @@
         <activity android:name=".view.test.Test2Activity" />
         <activity android:name=".view.activity.MainActivity" />
         <activity android:name=".view.activity.RegisterActivity" />
-        <activity android:name=".view.activity.LoginActivity">
-
-        </activity>
+        <activity android:name=".view.activity.LoginActivity"></activity>
         <activity android:name=".view.test.TestActivity" />
     </application>
 
