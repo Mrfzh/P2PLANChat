@@ -15,6 +15,7 @@ import com.feng.p2planchat.adapter.UserAdapter;
 import com.feng.p2planchat.base.BaseFragment;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IUserListContract;
+import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.serializable.OtherUserIp;
 import com.feng.p2planchat.entity.data.UserData;
@@ -203,6 +204,33 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeleteUserEventCome(Event<DeleteUserEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.DELETE_USER:
+                //删除在线用户
+                String deleteName = event.getData().getName();
+                for (int i = 0; i < mUserDataList.size(); i++) {
+                    UserData curr = mUserDataList.get(i);
+                    if (curr.getName().equals(deleteName)) {
+                        mUserDataList.remove(i);
+                        break;
+                    }
+                }
+                //将该用户从在线用户名字集合中删除
+                mUserNameSet.remove(deleteName);
+                //更新列表
+                mUserAdapter.notifyDataSetChanged();
+                if (mUserDataList.size() == 0) {
+                    //显示无人页面
+                    mNothingTv.setVisibility(View.VISIBLE);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
      * 初始化适配器
      */
@@ -258,6 +286,14 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     @Override
     public void findOtherUserSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+
+//        if (userList.size() == 0) {
+//            mUserDataList = new ArrayList<>();
+//            mUserAdapter.notifyDataSetChanged();
+//            //显示无人页面
+//            mNothingTv.setVisibility(View.VISIBLE);
+//            return;
+//        }
 
         //将其他用户的IP地址写入本地
         List<String> otherUserIpList = new ArrayList<>();

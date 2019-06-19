@@ -19,6 +19,8 @@ import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
+import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
+import com.feng.p2planchat.entity.eventbus.LogoutEvent;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.serializable.UpdateUser;
 import com.feng.p2planchat.entity.eventbus.Event;
@@ -259,6 +261,11 @@ public class MainActivity extends BaseActivity {
                                             updateUser.getOldName(), BitmapUtil.byteArray2Bitmap(updateUser.getNewHeadImage())));
                                     EventBusUtil.sendEvent(updateOtherHeadImageEvent);
                                     break;
+                                case Constant.DELETE_USER:
+                                    //删除用户
+                                    Event<DeleteUserEvent> deleteUserEvent = new Event<>(
+                                            EventBusCode.DELETE_USER, new DeleteUserEvent(updateUser.getOldName()));
+                                    EventBusUtil.sendEvent(deleteUserEvent);
                                 default:
                                     break;
                             }
@@ -290,13 +297,21 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onStickyEventBusCome(Event<MainEvent> event) {
-//        Log.d(TAG, "onStickyEventBusCome: urn");
-//        Log.d(TAG, "onStickyEventBusCome: event.getCode() = " + event.getCode());
-//        Log.d(TAG, "onStickyEventBusCome: event.getData() = " + event.getData());
         switch (event.getCode()) {
             case EventBusCode.LOGIN_2_MAIN:
             case EventBusCode.REGISTER_2_MAIN:
                 mUserList = event.getData().getUserList();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLogoutEventCome(Event<LogoutEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.LOGOUT:
+                finish();
                 break;
             default:
                 break;

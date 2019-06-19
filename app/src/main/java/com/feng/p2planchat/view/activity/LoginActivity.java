@@ -251,10 +251,6 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
         Event<MainEvent> mainEvent = new Event<>(EventBusCode.LOGIN_2_MAIN,
                 new MainEvent(userList));
         EventBusUtil.sendStickyEvent(mainEvent);
-//        //发送在线用户信息给用户列表页面
-//        Event<UserListEvent> userListEvent = new Event<>(EventBusCode.LOGIN_2_USER_LIST,
-//                new UserListEvent(userList));
-//        EventBusUtil.sendStickyEvent(userListEvent);
 
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < userList.size(); i++) {
