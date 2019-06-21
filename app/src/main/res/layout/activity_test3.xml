@@ -6,17 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".view.test.Test3Activity">
 
+    <EditText
+        android:id="@+id/et_test3_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <Button
-        android:id="@+id/btn_test3_change_widget_location"
+        android:id="@+id/btn_test3_send"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="改变控件的位置"/>
-
-    <TextView
-        android:id="@+id/tv_test3_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试文本"
-        android:layout_centerInParent="true"/>
+        android:text="发送消息"
+        android:layout_below="@id/et_test3_msg"/>
 
 </RelativeLayout>

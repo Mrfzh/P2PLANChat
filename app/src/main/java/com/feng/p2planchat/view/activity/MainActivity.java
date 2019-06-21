@@ -28,6 +28,7 @@ import com.feng.p2planchat.entity.eventbus.MainEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateOtherHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateOtherNameEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
+import com.feng.p2planchat.service.HandleChatService;
 import com.feng.p2planchat.service.HandleLoginService;
 import com.feng.p2planchat.service.HandleUpdateService;
 import com.feng.p2planchat.util.BitmapUtil;
@@ -171,6 +172,16 @@ public class MainActivity extends BaseActivity {
         //打开服务器端，随机接收其他用户的信息更新
         new Thread(new UpdateServiceThread()).start();
 
+        //打开服务器，随时接受其他用户的聊天信息
+        new Thread(new ChatServiceThread()).start();
+
+        showInfo();
+    }
+
+    /**
+     * 显示当前信息（测试方法，可删除）
+     */
+    private void showInfo() {
         User curr = UserUtil.readFromInternalStorage(this);
         String builder1 = null;
         if (curr != null) {
@@ -276,6 +287,33 @@ public class MainActivity extends BaseActivity {
                 }
             } catch (IOException e) {
                 Log.d(TAG, "UpdateServiceThread.IOException: " + e.toString());
+            }
+        }
+    }
+
+    class ChatServiceThread implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                //作为服务端，监听其他用户的登录信息
+                ServerSocket userServerSocket = new ServerSocket(Constant.CHAT_PORT);
+
+                //一直监听客户端
+                while (true) {
+                    Socket socket = userServerSocket.accept();
+                    //处理客户端的请求
+                    HandleChatService service = new HandleChatService(socket);
+                    service.setHandleChatServiceListener(new HandleChatService.HandleChatServiceListener() {
+                        @Override
+                        public void getMessage(String content) {
+                            Log.d(TAG, "getMessage: " + content);
+                        }
+                    });
+                    new Thread(service).start();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -10,12 +10,14 @@ import android.widget.TextView;
 public class UserData {
     private Bitmap headImage;      //对方用户头像
     private String name;        //对方用户名
+    private String ip;          //对方IP地址
     private String content;     //最近聊天内容
     private String time;        //最近聊天时间
 
-    public UserData(Bitmap headImage, String name, String content, String time) {
+    public UserData(Bitmap headImage, String name, String ip, String content, String time) {
         this.headImage = headImage;
         this.name = name;
+        this.ip = ip;
         this.content = content;
         this.time = time;
     }
@@ -50,5 +52,13 @@ public class UserData {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

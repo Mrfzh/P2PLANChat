@@ -15,6 +15,7 @@ public class Constant {
 
     public static final int USER_PORT = 20000;  //获取用户信息的端口号
     public static final int UPDATE_PORT = 21000;    //更新用户信息的端口号
+    public static final int CHAT_PORT = 23500;      //聊天的端口号
 
     //主页面底部tab的title
     public static final String [] MAIN_TAB_TITLES = {"用户列表", "我"};

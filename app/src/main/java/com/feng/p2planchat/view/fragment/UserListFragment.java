@@ -15,6 +15,7 @@ import com.feng.p2planchat.adapter.UserAdapter;
 import com.feng.p2planchat.base.BaseFragment;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IUserListContract;
+import com.feng.p2planchat.entity.eventbus.ChatEvent;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.serializable.OtherUserIp;
@@ -25,8 +26,10 @@ import com.feng.p2planchat.entity.eventbus.UpdateOtherNameEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.UserListPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.UserUtil;
+import com.feng.p2planchat.view.activity.ChatActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -67,9 +70,10 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             }
             Bitmap headImage = BitmapUtil.byteArray2Bitmap(currUser.getHeadImage());
             String name = currUser.getUserName();
+            String ip = currUser.getIpAddress();
             String content = "";
             String time = "";
-            mUserDataList.add(new UserData(headImage, name, content, time));
+            mUserDataList.add(new UserData(headImage, name, ip, content, time));
             mUserNameSet.add(name);
         }
     }
@@ -239,7 +243,12 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         mUserAdapter.setOnClickListener(new UserAdapter.OnClickListener() {
             @Override
             public void clickItem(int position) {
-                //item的点击事件
+                //点击item后，和对方进行聊天
+                Event<ChatEvent> chatEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
+                        new ChatEvent(mUserDataList.get(position).getName(),
+                                mUserDataList.get(position).getIp()));
+                EventBusUtil.sendStickyEvent(chatEvent);
+                jump2Activity(ChatActivity.class);
             }
         });
     }
@@ -255,7 +264,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             //更新用户列表
             Bitmap headImage = BitmapUtil.byteArray2Bitmap(user.getHeadImage());
             String name = user.getUserName();
-            mUserDataList.add(new UserData(headImage, name, "", ""));
+            String ip = user.getIpAddress();
+            mUserDataList.add(new UserData(headImage, name, ip, "", ""));
             mUserAdapter.notifyDataSetChanged();
             //隐藏掉无人页面
             mNothingTv.setVisibility(View.GONE);
@@ -287,13 +297,13 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     public void findOtherUserSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
 
-//        if (userList.size() == 0) {
-//            mUserDataList = new ArrayList<>();
-//            mUserAdapter.notifyDataSetChanged();
-//            //显示无人页面
-//            mNothingTv.setVisibility(View.VISIBLE);
-//            return;
-//        }
+        if (userList.size() == 0) {
+            mUserDataList = new ArrayList<>();
+            mUserAdapter.notifyDataSetChanged();
+            //显示无人页面
+            mNothingTv.setVisibility(View.VISIBLE);
+            return;
+        }
 
         //将其他用户的IP地址写入本地
         List<String> otherUserIpList = new ArrayList<>();
@@ -315,7 +325,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             if (!mUserNameSet.contains(curr.getUserName())) {
                 Bitmap headImage = BitmapUtil.byteArray2Bitmap(curr.getHeadImage());
                 String name = curr.getUserName();
-                mUserDataList.add(new UserData(headImage, name, "", ""));
+                String ip = curr.getIpAddress();
+                mUserDataList.add(new UserData(headImage, name, ip, "", ""));
                 //添加到用户名集合中
                 mUserNameSet.add(name);
             }
