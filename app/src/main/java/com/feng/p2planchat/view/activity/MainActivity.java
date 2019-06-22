@@ -19,6 +19,8 @@ import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
+import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
+import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
 import com.feng.p2planchat.entity.eventbus.LogoutEvent;
 import com.feng.p2planchat.entity.serializable.User;
@@ -306,8 +308,12 @@ public class MainActivity extends BaseActivity {
                     HandleChatService service = new HandleChatService(socket);
                     service.setHandleChatServiceListener(new HandleChatService.HandleChatServiceListener() {
                         @Override
-                        public void getMessage(String content) {
-                            Log.d(TAG, "getMessage: " + content);
+                        public void getMessage(ChatData chatData) {
+                            Log.d(TAG, "getMessage: " + chatData);
+                            //将新消息发送给用户列表界面
+                            Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_DATA,
+                                    new ChatDataEvent(chatData));
+                            EventBusUtil.sendEvent(chatDataEvent);
                         }
                     });
                     new Thread(service).start();

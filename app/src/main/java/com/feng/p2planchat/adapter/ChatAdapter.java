@@ -10,7 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.feng.p2planchat.R;
-import com.feng.p2planchat.entity.data.ChatData;
+import com.feng.p2planchat.entity.serializable.ChatData;
+import com.feng.p2planchat.util.BitmapUtil;
 
 import java.util.List;
 
@@ -37,6 +38,9 @@ public class ChatAdapter extends RecyclerView.Adapter {
         } else if (i == ChatData.RECEIVE_TEXT) {
             return new ReceiveTextViewHolder(LayoutInflater.from(mContext).inflate(
                     R.layout.item_chat_receive_text, null));
+        } else if (i == ChatData.TIME) {
+            return new TimeViewHolder(LayoutInflater.from(mContext).inflate(
+                    R.layout.item_chat_time, null));
         }
         return null;
     }
@@ -45,12 +49,23 @@ public class ChatAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
         if (viewHolder instanceof SendTextViewHolder) {
             SendTextViewHolder sendTextViewHolder = (SendTextViewHolder) viewHolder;
-            sendTextViewHolder.headImage.setImageBitmap(mChatDataList.get(i).getHeadImage());
+            sendTextViewHolder.headImage.setImageBitmap(BitmapUtil
+                    .byteArray2Bitmap(mChatDataList.get(i).getHeadImage()));
             sendTextViewHolder.content.setText(mChatDataList.get(i).getContent());
         } else if (viewHolder instanceof ReceiveTextViewHolder) {
             ReceiveTextViewHolder receiveTextViewHolder = (ReceiveTextViewHolder) viewHolder;
-            receiveTextViewHolder.headImage.setImageBitmap(mChatDataList.get(i).getHeadImage());
+            receiveTextViewHolder.headImage.setImageBitmap(BitmapUtil
+                    .byteArray2Bitmap(mChatDataList.get(i).getHeadImage()));
             receiveTextViewHolder.content.setText(mChatDataList.get(i).getContent());
+        } else if (viewHolder instanceof TimeViewHolder) {
+            TimeViewHolder timeViewHolder = (TimeViewHolder) viewHolder;
+            String time = mChatDataList.get(i).getTime();
+            String when = "";
+            int hour = Integer.parseInt(time.substring(0, 2));
+            if (hour < 12 && hour >= 6) {
+                when = "早上";
+            }
+            timeViewHolder.time.setText(when + time.substring(0, 5));
         }
     }
 
@@ -86,6 +101,16 @@ public class ChatAdapter extends RecyclerView.Adapter {
             super(itemView);
             headImage = itemView.findViewById(R.id.iv_item_chat_receive_text_head_image);
             content = itemView.findViewById(R.id.tv_item_chat_receive_text_content);
+        }
+    }
+
+    class TimeViewHolder extends RecyclerView.ViewHolder {
+
+        TextView time;
+
+        public TimeViewHolder(@NonNull View itemView) {
+            super(itemView);
+            time = itemView.findViewById(R.id.tv_item_chat_time_time);
         }
     }
 }

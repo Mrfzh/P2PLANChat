@@ -1,5 +1,7 @@
 package com.feng.p2planchat.client;
 
+import com.feng.p2planchat.entity.serializable.ChatData;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -14,11 +16,11 @@ public class ChatClient implements Runnable {
     private static final String TAG = "fzh";
 
     private Socket mSocket;
-    private String mContent;
+    private ChatData mChatData;
 
-    public ChatClient(Socket mSocket, String mContent) {
+    public ChatClient(Socket mSocket, ChatData mChatData) {
         this.mSocket = mSocket;
-        this.mContent = mContent;
+        this.mChatData = mChatData;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class ChatClient implements Runnable {
         try {
             os = mSocket.getOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
-            oos.writeObject(mContent);
+            oos.writeObject(mChatData);
             mSocket.shutdownOutput();   //关闭客户端Socket的输出流
         } catch (IOException e) {
             e.printStackTrace();

@@ -15,6 +15,7 @@ import com.feng.p2planchat.adapter.UserAdapter;
 import com.feng.p2planchat.base.BaseFragment;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IUserListContract;
+import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
 import com.feng.p2planchat.entity.eventbus.ChatEvent;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
 import com.feng.p2planchat.entity.serializable.User;
@@ -57,6 +58,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     private List<UserData> mUserDataList = new ArrayList<>();
 
     private UserAdapter mUserAdapter;
+    //保存当前在线的用户名
     private HashSet<String> mUserNameSet = new HashSet<>();
 
     @Override
@@ -229,6 +231,17 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                     //显示无人页面
                     mNothingTv.setVisibility(View.VISIBLE);
                 }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onChatDataEventCome(Event<ChatDataEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.CHAT_DATA:
+                //收到新消息后
                 break;
             default:
                 break;

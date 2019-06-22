@@ -9,6 +9,7 @@ import android.util.Log;
 import com.feng.p2planchat.client.ChatClient;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.contract.IChatContract;
+import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.util.NetUtil;
 
 import java.io.IOException;
@@ -27,13 +28,15 @@ public class ChatModel implements IChatContract.Model {
 
     private IChatContract.Presenter mPresenter;
 
+    private ChatData mChatData;
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_SEND_SUCCESS:
-                    mPresenter.sendTextSuccess();
+                    mPresenter.sendTextSuccess(mChatData);
                     break;
                 case MESSAGE_SEND_ERROR:
                     mPresenter.sendTextError("发送失败");
@@ -50,28 +53,28 @@ public class ChatModel implements IChatContract.Model {
 
     /**
      * 发送文字消息
-     *
-     * @param otherIp 对方的IP地址
-     * @param content 发送的消息
      */
     @Override
-    public void sendText(Context context, String otherIp, String content) {
+    public void sendText(Context context, String otherIp, ChatData chatData) {
+        mChatData = chatData;
+
         if (!NetUtil.hasInternet(context)) {
             mPresenter.sendTextError("当前没有网络");
         }
 
-        //发送消息
-        new Thread(new ChatClientThread(otherIp, content)).start();
+        mPresenter.sendTextSuccess(chatData);
+        //发送文字消息
+        new Thread(new ChatClientThread(otherIp, chatData)).start();
     }
 
     class ChatClientThread implements Runnable {
 
         private String otherIp;     //对方的IP地址
-        private String content;     //发送的消息
+        private ChatData chatData;     //发送的消息
 
-        public ChatClientThread(String otherIp, String content) {
+        public ChatClientThread(String otherIp, ChatData chatData) {
             this.otherIp = otherIp;
-            this.content = content;
+            this.chatData = chatData;
         }
 
         @Override
@@ -80,10 +83,10 @@ public class ChatModel implements IChatContract.Model {
                 //注意：如果对方没有打开相应端口，会抛出IOException
                 Socket socket = new Socket(otherIp, Constant.CHAT_PORT);
 
-                ChatClient chatClient = new ChatClient(socket, content);
+                ChatClient chatClient = new ChatClient(socket, chatData);
                 new Thread(chatClient).start();
 
-                mHandler.obtainMessage(MESSAGE_SEND_SUCCESS).sendToTarget();
+//                mHandler.obtainMessage(MESSAGE_SEND_SUCCESS).sendToTarget();
 
             } catch (UnknownHostException e) {
                 Log.d(TAG, "UnknownHostException : " + e.getMessage());

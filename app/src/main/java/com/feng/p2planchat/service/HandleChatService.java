@@ -1,5 +1,7 @@
 package com.feng.p2planchat.service;
 
+import com.feng.p2planchat.entity.serializable.ChatData;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -16,7 +18,7 @@ public class HandleChatService implements Runnable{
     private HandleChatServiceListener mListener;
 
     public interface HandleChatServiceListener {
-        void getMessage(String content);    //回调得到的消息
+        void getMessage(ChatData chatData);    //回调得到的消息
     }
 
     public void setHandleChatServiceListener(HandleChatServiceListener listener) {
@@ -33,8 +35,8 @@ public class HandleChatService implements Runnable{
         try {
             is = mSocket.getInputStream();
             ObjectInputStream ois = new ObjectInputStream(is);
-            String msg = (String) ois.readObject();
-            mListener.getMessage(msg);
+            ChatData chatData = (ChatData) ois.readObject();
+            mListener.getMessage(chatData);
             mSocket.shutdownInput();    //关闭服务端Socket的输入流
         } catch (IOException e) {
             e.printStackTrace();

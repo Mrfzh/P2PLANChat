@@ -77,5 +77,6 @@
     <color name="color_chat_more_function_top_line">#dddddd</color>
     <color name="color_chat_more_function_image_bg_before_pressed">#fcfcfc</color>
     <color name="color_chat_more_function_image_bg_after_pressed">#e1e1e1</color>
+    <color name="color_chat_time">#aaaaaa</color>
 
 </resources>

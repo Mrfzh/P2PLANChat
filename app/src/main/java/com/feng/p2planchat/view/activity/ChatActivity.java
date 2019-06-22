@@ -1,12 +1,11 @@
 package com.feng.p2planchat.view.activity;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,25 +15,20 @@ import android.widget.TextView;
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.adapter.ChatAdapter;
 import com.feng.p2planchat.base.BaseActivity;
-import com.feng.p2planchat.base.BasePresenter;
-import com.feng.p2planchat.client.ChatClient;
-import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IChatContract;
-import com.feng.p2planchat.entity.data.ChatData;
+import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.entity.eventbus.ChatEvent;
 import com.feng.p2planchat.entity.eventbus.Event;
-import com.feng.p2planchat.entity.eventbus.UserListEvent;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.presenter.ChatPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,12 +45,13 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     private ImageView mBackIv;
     private EditText mInputEt;                  //文字输入
 
-
     private Bitmap mOwnHeadImage;   //自己的头像
     private String mOtherIp;        //对方的IP地址
     private String mOtherName;      //对方的用户名
     private List<ChatData> mChatDataList = new ArrayList<>();
     private ChatAdapter mChatAdapter;
+
+    private String mLastTime = "";   //上一发送消息的时间（双方对话间隔3分钟以上时才显示时间）
 
     @Override
     protected void doBeforeSetContentView() {
@@ -157,8 +152,16 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                 finish();
                 break;
             case R.id.tv_chat_send_text:
+                final String message = mInputEt.getText().toString();
+                //清除输入
+                mInputEt.setText("");
                 //发送消息
-                mPresenter.sendText(this, mOtherIp, mInputEt.getText().toString());
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPresenter.sendText(ChatActivity.this, mOtherIp, getSendTextChatData(message));
+                    }
+                }, 100);
                 break;
             default:
                 break;
@@ -169,12 +172,17 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
      * 发送消息成功
      */
     @Override
-    public void sendTextSuccess() {
+    public void sendTextSuccess(ChatData chatData) {
         //更新列表
-        mChatDataList.add(new ChatData(mOwnHeadImage, mInputEt.getText().toString(), ChatData.SEND_TEXT));
+        //先判断是否需要显示时间
+        String currTime = chatData.getTime();
+        if (mLastTime.equals("") || TimeUtil.getTimeInterval(mLastTime, currTime) >= 3) {
+            mChatDataList.add(new ChatData(currTime));
+        }
+        mLastTime = currTime;
+        //添加信息
+        mChatDataList.add(chatData);
         mChatAdapter.notifyDataSetChanged();
-        //清除输入
-        mInputEt.setText("");
     }
 
     /**
@@ -185,8 +193,6 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     @Override
     public void sendTextError(String errorMsg) {
         showShortToast(errorMsg);
-        //清除输入
-        mInputEt.setText("");
     }
 
     @Override
@@ -204,5 +210,17 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
             default:
                 break;
         }
+    }
+
+    /**
+     * 得到发送文字消息的ChatData
+     *
+     * @param content 发送的文字消息
+     * @return
+     */
+    private ChatData getSendTextChatData(String content) {
+        return new ChatData(UserUtil.readFromInternalStorage(this).getUserName(),
+                BitmapUtil.bitmap2ByteArray(mOwnHeadImage), content,
+                TimeUtil.getCurrTime(), ChatData.SEND_TEXT);
     }
 }

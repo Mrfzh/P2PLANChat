@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.contract.IChatContract;
+import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.model.ChatModel;
 
 /**
@@ -20,9 +21,9 @@ public class ChatPresenter extends BasePresenter<IChatContract.View>
     }
 
     @Override
-    public void sendTextSuccess() {
+    public void sendTextSuccess(ChatData chatData) {
         if (isAttachView()) {
-            getMvpView().sendTextSuccess();
+            getMvpView().sendTextSuccess(chatData);
         }
     }
 
@@ -34,7 +35,7 @@ public class ChatPresenter extends BasePresenter<IChatContract.View>
     }
 
     @Override
-    public void sendText(Context context, String otherIp, String content) {
-        mModel.sendText(context, otherIp, content);
+    public void sendText(Context context, String otherIp, ChatData chatData) {
+        mModel.sendText(context, otherIp, chatData);
     }
 }
