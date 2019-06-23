@@ -47,7 +47,7 @@ public class PersonModel implements IPersonContract.Model {
 
         //作为客户端，向其他在线用户发出广播
         mOtherUserIpList = OtherUserIpUtil.readFromInternalStorage(context).getOtherUserIpList();
-        mUpdateInfo = new UpdateUser(UserUtil.readFromInternalStorage(context).getUserName());
+        mUpdateInfo = new UpdateUser(UserUtil.readFromInternalStorage(context).getIpAddress());
         new Thread(new UpdateClientThread()).start();
     }
 

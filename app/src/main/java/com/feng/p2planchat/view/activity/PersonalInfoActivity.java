@@ -209,7 +209,7 @@ public class PersonalInfoActivity extends BaseActivity<PersonalInfoPresenter>
 
         //通知其他用户更新头像
         mPresenter.modifyHeadImage(OtherUserIpUtil.readFromInternalStorage(this).getOtherUserIpList(),
-                UserUtil.readFromInternalStorage(this).getUserName(), mNewBitmap, this);
+                UserUtil.readFromInternalStorage(this).getIpAddress(), mNewBitmap, this);
     }
 
     /**

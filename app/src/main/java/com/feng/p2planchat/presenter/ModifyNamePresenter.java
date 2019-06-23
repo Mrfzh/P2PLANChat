@@ -36,8 +36,8 @@ public class ModifyNamePresenter extends BasePresenter<IModifyNameContract.View>
     }
 
     @Override
-    public void modifyName(List<String> otherUserIpList, String oldName,
+    public void modifyName(List<String> otherUserIpList, String ip,
                            String newName, Context context) {
-        mModel.modifyName(otherUserIpList, oldName, newName, context);
+        mModel.modifyName(otherUserIpList, ip, newName, context);
     }
 }

@@ -8,20 +8,20 @@ import android.graphics.Bitmap;
  */
 public class UpdateOtherHeadImageEvent {
 
-    private String oldName;
+    private String ip;
     private Bitmap newHeadImage;
 
-    public UpdateOtherHeadImageEvent(String oldName, Bitmap newHeadImage) {
-        this.oldName = oldName;
+    public UpdateOtherHeadImageEvent(String ip, Bitmap newHeadImage) {
+        this.ip = ip;
         this.newHeadImage = newHeadImage;
     }
 
-    public String getOldName() {
-        return oldName;
+    public String getIp() {
+        return ip;
     }
 
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public Bitmap getNewHeadImage() {

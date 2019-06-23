@@ -16,9 +16,9 @@ public interface IModifyNameContract {
     interface Presenter {
         void modifyNameSuccess();
         void modifyNameError(String errorMsg);
-        void modifyName(List<String> otherUserIpList, String oldName, String newName, Context context);
+        void modifyName(List<String> otherUserIpList, String ip, String newName, Context context);
     }
     interface Model {
-        void modifyName(List<String> otherUserIpList, String oldName, String newName, Context context);
+        void modifyName(List<String> otherUserIpList, String ip, String newName, Context context);
     }
 }

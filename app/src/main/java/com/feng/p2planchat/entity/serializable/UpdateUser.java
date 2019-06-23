@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public class UpdateUser implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String oldName;
+    private String ip;          //更新用户的ip地址
     private String newName;
     private byte [] newHeadImage;
     //要更新的信息，
@@ -18,31 +18,31 @@ public class UpdateUser implements Serializable {
     private int updateWhat;
 
     //更新用户名
-    public UpdateUser(String oldName, String newName) {
-        this.oldName = oldName;
+    public UpdateUser(String ip, String newName) {
+        this.ip = ip;
         this.newName = newName;
         this.updateWhat = Constant.UPDATE_USER_NAME;
     }
 
     //更新用户头像
-    public UpdateUser(String oldName, byte[] newHeadImage) {
-        this.oldName = oldName;
+    public UpdateUser(String ip, byte[] newHeadImage) {
+        this.ip = ip;
         this.newHeadImage = newHeadImage;
         this.updateWhat = Constant.UPDATE_HEAD_IMAGE;
     }
 
     //删除用户（该用户退出登录）
-    public UpdateUser(String oldName) {
-        this.oldName = oldName;
+    public UpdateUser(String ip) {
+        this.ip = ip;
         this.updateWhat = Constant.DELETE_USER;
     }
 
-    public String getOldName() {
-        return oldName;
+    public String getIp() {
+        return ip;
     }
 
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public String getNewName() {

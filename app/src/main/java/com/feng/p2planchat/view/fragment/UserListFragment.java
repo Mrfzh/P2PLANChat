@@ -36,6 +36,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -55,11 +56,13 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     private ProgressBar mProgressBar;
 
     private List<User> mUserList = new ArrayList<>();
+
+    //用户聊天信息集合
     private List<UserData> mUserDataList = new ArrayList<>();
 
     private UserAdapter mUserAdapter;
-    //保存当前在线的用户名
-    private HashSet<String> mUserNameSet = new HashSet<>();
+    //保存当前在线的用户名的IP地址
+    private HashSet<String> mUserIpSet = new HashSet<>();
 
     @Override
     protected void initData() {
@@ -73,10 +76,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             Bitmap headImage = BitmapUtil.byteArray2Bitmap(currUser.getHeadImage());
             String name = currUser.getUserName();
             String ip = currUser.getIpAddress();
-            String content = "";
-            String time = "";
-            mUserDataList.add(new UserData(headImage, name, ip, content, time));
-            mUserNameSet.add(name);
+            mUserDataList.add(new UserData(headImage, name, ip));
+            mUserIpSet.add(ip);
         }
     }
 
@@ -175,10 +176,10 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         switch (event.getCode()) {
             case EventBusCode.UPDATE_OTHER_NAME:
                 //更新在线用户的用户名
-                String oldName = event.getData().getOldName();
+                String ip = event.getData().getIp();
                 for (int i = 0; i < mUserDataList.size(); i++) {
                     UserData curr = mUserDataList.get(i);
-                    if (curr.getName().equals(oldName)) {
+                    if (curr.getIp().equals(ip)) {
                         curr.setName(event.getData().getNewName());
                         break;
                     }
@@ -195,10 +196,10 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         switch (event.getCode()) {
             case EventBusCode.UPDATE_OTHER_HEAD_IMAGE:
                 //更新在线用户的头像
-                String oldName = event.getData().getOldName();
+                String ip = event.getData().getIp();
                 for (int i = 0; i < mUserDataList.size(); i++) {
                     UserData curr = mUserDataList.get(i);
-                    if (curr.getName().equals(oldName)) {
+                    if (curr.getIp().equals(ip)) {
                         curr.setHeadImage(event.getData().getNewHeadImage());
                         break;
                     }
@@ -214,17 +215,16 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     public void onDeleteUserEventCome(Event<DeleteUserEvent> event) {
         switch (event.getCode()) {
             case EventBusCode.DELETE_USER:
-                //删除在线用户
-                String deleteName = event.getData().getName();
+                //根据ip地址删除在线用户
+                String deleteIp = event.getData().getIp();
+                //将该用户从在线用户名字集合中删除
+                mUserIpSet.remove(deleteIp);
                 for (int i = 0; i < mUserDataList.size(); i++) {
-                    UserData curr = mUserDataList.get(i);
-                    if (curr.getName().equals(deleteName)) {
+                    if (mUserDataList.get(i).getIp().equals(deleteIp)) {
                         mUserDataList.remove(i);
                         break;
                     }
                 }
-                //将该用户从在线用户名字集合中删除
-                mUserNameSet.remove(deleteName);
                 //更新列表
                 mUserAdapter.notifyDataSetChanged();
                 if (mUserDataList.size() == 0) {
@@ -242,6 +242,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         switch (event.getCode()) {
             case EventBusCode.CHAT_DATA:
                 //收到新消息后
+
                 break;
             default:
                 break;
@@ -253,6 +254,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
      */
     private void initAdapter() {
         mUserAdapter = new UserAdapter(getContext(), mUserDataList);
+        
         mUserAdapter.setOnClickListener(new UserAdapter.OnClickListener() {
             @Override
             public void clickItem(int position) {
@@ -273,17 +275,17 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
      */
     private void hasNewUser(User user) {
         //如果该用户不在列表，添加进列表
-        if (!mUserNameSet.contains(user.getUserName())) {
+        if (!mUserIpSet.contains(user.getIpAddress())) {
             //更新用户列表
             Bitmap headImage = BitmapUtil.byteArray2Bitmap(user.getHeadImage());
             String name = user.getUserName();
             String ip = user.getIpAddress();
-            mUserDataList.add(new UserData(headImage, name, ip, "", ""));
+            mUserDataList.add(new UserData(headImage, name, ip));
             mUserAdapter.notifyDataSetChanged();
             //隐藏掉无人页面
             mNothingTv.setVisibility(View.GONE);
             //添加到用户名集合中
-            mUserNameSet.add(name);
+            mUserIpSet.add(ip);
 
             //将新用户的IP地址写入本地
             List<String> otherUserIpList = OtherUserIpUtil
@@ -335,13 +337,13 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             if (curr == null) {
                 continue;
             }
-            if (!mUserNameSet.contains(curr.getUserName())) {
+            if (!mUserIpSet.contains(curr.getIpAddress())) {
                 Bitmap headImage = BitmapUtil.byteArray2Bitmap(curr.getHeadImage());
                 String name = curr.getUserName();
                 String ip = curr.getIpAddress();
-                mUserDataList.add(new UserData(headImage, name, ip, "", ""));
+                mUserDataList.add(new UserData(headImage, name, ip));
                 //添加到用户名集合中
-                mUserNameSet.add(name);
+                mUserIpSet.add(name);
             }
         }
 

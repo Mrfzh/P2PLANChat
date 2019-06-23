@@ -5,17 +5,17 @@ package com.feng.p2planchat.entity.eventbus;
  * Created on 2019/6/19
  */
 public class DeleteUserEvent {
-    private String name;
+    private String ip;
 
-    public DeleteUserEvent(String name) {
-        this.name = name;
+    public DeleteUserEvent(String ip) {
+        this.ip = ip;
     }
 
-    public String getName() {
-        return name;
+    public String getIp() {
+        return ip;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

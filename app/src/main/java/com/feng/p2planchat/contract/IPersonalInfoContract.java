@@ -17,9 +17,9 @@ public interface IPersonalInfoContract {
     interface Presenter {
         void modifyHeadImageSuccess();
         void modifyHeadImageError(String errorMsg);
-        void modifyHeadImage(List<String> otherUserIpList, String oldName, Bitmap newHeadImage, Context context);
+        void modifyHeadImage(List<String> otherUserIpList, String ip, Bitmap newHeadImage, Context context);
     }
     interface Model {
-        void modifyHeadImage(List<String> otherUserIpList, String oldName, Bitmap newHeadImage, Context context);
+        void modifyHeadImage(List<String> otherUserIpList, String ip, Bitmap newHeadImage, Context context);
     }
 }

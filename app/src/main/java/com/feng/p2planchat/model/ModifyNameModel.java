@@ -49,18 +49,19 @@ public class ModifyNameModel implements IModifyNameContract.Model {
      * 更改自己的用户名
      *
      * @param otherUserIpList 其他在线用户的IP地址
-     * @param oldName 旧的用户名
+     * @param ip 自己的IP地址
      * @param newName 新的用户名
      * @param context
      */
     @Override
     public void modifyName(List<String> otherUserIpList,
-                           String oldName, String newName, Context context) {
+                           String ip, String newName, Context context) {
         AccountDatabaseHelper helper = new AccountDatabaseHelper(context,
                 Constant.DATABASE_ACCOUNT, null, 1);
         SQLiteDatabase db = helper.getWritableDatabase();
         mAccountOperation = new AccountOperation(db);
 
+        String oldName = UserUtil.readFromInternalStorage(context).getUserName();
         //从数据库中删除旧用户名，并添加新用户名
         Log.d(TAG, "pre : database = " + mAccountOperation.showAll());
         String password = mAccountOperation.getPassword(oldName);
@@ -82,13 +83,13 @@ public class ModifyNameModel implements IModifyNameContract.Model {
         EventBusUtil.sendEvent(updateNameEvent);
 
         //通知其他在线用户，更新自己的用户名
-        notifyOtherUser(otherUserIpList, oldName, newName, context);
+        notifyOtherUser(otherUserIpList, ip, newName, context);
 
         mPresenter.modifyNameSuccess();
     }
 
     private void notifyOtherUser(List<String> otherUserIpList,
-                                 String oldName, String newName, Context context) {
+                                 String ip, String newName, Context context) {
         //先检测网络
         if (!NetUtil.hasInternet(context)) {
             mPresenter.modifyNameError("当前没有网络，未能通知其他用户更新自己的用户名");
@@ -97,7 +98,7 @@ public class ModifyNameModel implements IModifyNameContract.Model {
 
         //作为客户端，向其他在线用户发出广播
         mOtherUserIpList = otherUserIpList;
-        mUpdateInfo = new UpdateUser(oldName, newName);
+        mUpdateInfo = new UpdateUser(ip, newName);
         new Thread(new UpdateClientThread()).start();
 
     }

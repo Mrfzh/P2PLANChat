@@ -5,20 +5,20 @@ package com.feng.p2planchat.entity.eventbus;
  * Created on 2019/6/15
  */
 public class UpdateOtherNameEvent {
-    private String oldName;
+    private String ip;
     private String newName;
 
-    public UpdateOtherNameEvent(String oldName, String newName) {
-        this.oldName = oldName;
+    public UpdateOtherNameEvent(String ip, String newName) {
+        this.ip = ip;
         this.newName = newName;
     }
 
-    public String getOldName() {
-        return oldName;
+    public String getIp() {
+        return ip;
     }
 
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public String getNewName() {

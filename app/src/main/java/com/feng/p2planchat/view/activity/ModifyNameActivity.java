@@ -128,7 +128,7 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
         newName = newName.replaceAll(" ", "");
         if (check(newName)) {
             mPresenter.modifyName(OtherUserIpUtil.readFromInternalStorage(this).getOtherUserIpList(),
-                    UserUtil.readFromInternalStorage(this).getUserName(), newName, this);
+                    UserUtil.readFromInternalStorage(this).getIpAddress(), newName, this);
         } else {
             mProgressBar.setVisibility(View.GONE);
         }

@@ -38,7 +38,7 @@ public class PersonalInfoPresenter extends BasePresenter<IPersonalInfoContract.V
 
     @Override
     public void modifyHeadImage(List<String> otherUserIpList,
-                                String oldName, Bitmap newHeadImage, Context context) {
-        mModel.modifyHeadImage(otherUserIpList, oldName, newHeadImage, context);
+                                String ip, Bitmap newHeadImage, Context context) {
+        mModel.modifyHeadImage(otherUserIpList, ip, newHeadImage, context);
     }
 }

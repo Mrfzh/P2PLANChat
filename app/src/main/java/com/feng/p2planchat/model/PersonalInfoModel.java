@@ -37,13 +37,13 @@ public class PersonalInfoModel implements IPersonalInfoContract.Model {
      * 更新头像
      *
      * @param otherUserIpList
-     * @param oldName
+     * @param ip
      * @param newHeadImage
      * @param context
      */
     @Override
     public void modifyHeadImage(List<String> otherUserIpList,
-                                String oldName, Bitmap newHeadImage, Context context) {
+                                String ip, Bitmap newHeadImage, Context context) {
         //先检测网络
         if (!NetUtil.hasInternet(context)) {
             mPresenter.modifyHeadImageError("当前没有网络，未能通知其他用户更新自己的头像");
@@ -52,7 +52,7 @@ public class PersonalInfoModel implements IPersonalInfoContract.Model {
 
         //作为客户端，向其他在线用户发出广播
         mOtherUserIpList = otherUserIpList;
-        mUpdateInfo = new UpdateUser(oldName, BitmapUtil.bitmap2ByteArray(newHeadImage));
+        mUpdateInfo = new UpdateUser(ip, BitmapUtil.bitmap2ByteArray(newHeadImage));
         new Thread(new UpdateClientThread()).start();
 
         mPresenter.modifyHeadImageSuccess();

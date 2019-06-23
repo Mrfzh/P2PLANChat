@@ -264,20 +264,20 @@ public class MainActivity extends BaseActivity {
                                     //更新用户名
                                     Event<UpdateOtherNameEvent> updateOtherNameEvent = new Event<>(
                                             EventBusCode.UPDATE_OTHER_NAME, new UpdateOtherNameEvent(
-                                                    updateUser.getOldName(), updateUser.getNewName()));
+                                                    updateUser.getIp(), updateUser.getNewName()));
                                     EventBusUtil.sendEvent(updateOtherNameEvent);
                                     break;
                                 case Constant.UPDATE_HEAD_IMAGE:
                                     //更新头像
                                     Event<UpdateOtherHeadImageEvent> updateOtherHeadImageEvent = new Event<>(
                                             EventBusCode.UPDATE_OTHER_HEAD_IMAGE, new UpdateOtherHeadImageEvent(
-                                            updateUser.getOldName(), BitmapUtil.byteArray2Bitmap(updateUser.getNewHeadImage())));
+                                            updateUser.getIp(), BitmapUtil.byteArray2Bitmap(updateUser.getNewHeadImage())));
                                     EventBusUtil.sendEvent(updateOtherHeadImageEvent);
                                     break;
                                 case Constant.DELETE_USER:
                                     //删除用户
                                     Event<DeleteUserEvent> deleteUserEvent = new Event<>(
-                                            EventBusCode.DELETE_USER, new DeleteUserEvent(updateUser.getOldName()));
+                                            EventBusCode.DELETE_USER, new DeleteUserEvent(updateUser.getIp()));
                                     EventBusUtil.sendEvent(deleteUserEvent);
                                 default:
                                     break;
