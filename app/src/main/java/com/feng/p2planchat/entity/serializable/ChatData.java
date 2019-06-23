@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class ChatData implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private String ip;          //发送消息的用户IP地址
     private String name;        //发送消息的用户
     private byte[] headImage;   //发送消息的用户头像
     private String content;     //文字消息的内容
@@ -24,7 +25,9 @@ public class ChatData implements Serializable {
     public static final int TIME = 5;
 
     //发送或接收文字信息
-    public ChatData(String name, byte[] headImage, String content, String time, int type) {
+    public ChatData(String ip, String name, byte[] headImage, String content,
+                    String time, int type) {
+        this.ip = ip;
         this.name = name;
         this.headImage = headImage;
         this.content = content;
@@ -33,7 +36,9 @@ public class ChatData implements Serializable {
     }
 
     //发送或接收图片信息
-    public ChatData(String name, byte[] headImage, String time, byte[] picture, int type) {
+    public ChatData(String ip, String name, byte[] headImage, String time,
+                    byte[] picture, int type) {
+        this.ip = ip;
         this.name = name;
         this.headImage = headImage;
         this.time = time;
@@ -42,9 +47,18 @@ public class ChatData implements Serializable {
     }
 
     //时间
-    public ChatData(String time) {
+    public ChatData(String ip, String time) {
+        this.ip = ip;
         this.time = time;
         this.type = TIME;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public byte[] getHeadImage() {

@@ -311,7 +311,7 @@ public class MainActivity extends BaseActivity {
                         public void getMessage(ChatData chatData) {
                             Log.d(TAG, "getMessage: " + chatData);
                             //将新消息发送给用户列表界面
-                            Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_DATA,
+                            Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST,
                                     new ChatDataEvent(chatData));
                             EventBusUtil.sendEvent(chatDataEvent);
                         }

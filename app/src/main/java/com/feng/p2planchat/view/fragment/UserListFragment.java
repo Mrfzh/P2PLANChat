@@ -16,8 +16,8 @@ import com.feng.p2planchat.base.BaseFragment;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IUserListContract;
 import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
-import com.feng.p2planchat.entity.eventbus.ChatEvent;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
+import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.serializable.OtherUserIp;
 import com.feng.p2planchat.entity.data.UserData;
@@ -29,6 +29,7 @@ import com.feng.p2planchat.presenter.UserListPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.OtherUserIpUtil;
+import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.view.activity.ChatActivity;
 
@@ -36,7 +37,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -240,9 +240,33 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatDataEventCome(Event<ChatDataEvent> event) {
         switch (event.getCode()) {
-            case EventBusCode.CHAT_DATA:
-                //收到新消息后
-
+            case EventBusCode.MAIN_2_USER_LIST:
+                if (!event.getData().isOneData()) {
+                    break;
+                }
+                //收到新消息后（文本信息）
+                ChatData chatData = event.getData().getChatData();
+                //更新用户列表的最新消息和时间
+                String ip = chatData.getIp();
+                for (int i = 0; i < mUserDataList.size(); i++) {
+                    UserData curr = mUserDataList.get(i);
+                    if (curr.getIp().equals(ip)) {
+                        curr.setTime(chatData.getTime());
+                        curr.setContent(chatData.getContent());
+                        //更新聊天消息
+                        List<ChatData> list = curr.getChatDataList();
+                        //判断是否要显示时间
+                        if (list.size() == 0 || TimeUtil.getTimeInterval(list.get(list.size()-1).getTime()
+                                , chatData.getTime()) >= 3) {
+                            list.add(new ChatData(chatData.getIp(), chatData.getTime()));
+                        }
+                        //将消息设置为接收类型
+                        chatData.setType(ChatData.RECEIVE_TEXT);
+                        list.add(chatData);
+                        break;
+                    }
+                }
+                mUserAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -259,10 +283,10 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             @Override
             public void clickItem(int position) {
                 //点击item后，和对方进行聊天
-                Event<ChatEvent> chatEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
-                        new ChatEvent(mUserDataList.get(position).getName(),
-                                mUserDataList.get(position).getIp()));
-                EventBusUtil.sendStickyEvent(chatEvent);
+                UserData userData = mUserDataList.get(position);
+                Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
+                        new ChatDataEvent(userData.getName(), userData.getIp(), userData.getChatDataList()));
+                EventBusUtil.sendStickyEvent(chatDataEvent);
                 jump2Activity(ChatActivity.class);
             }
         });

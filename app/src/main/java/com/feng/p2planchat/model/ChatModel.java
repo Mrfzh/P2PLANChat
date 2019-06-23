@@ -80,13 +80,12 @@ public class ChatModel implements IChatContract.Model {
         @Override
         public void run() {
             try {
+                Log.d(TAG, "run: otherIp = " + otherIp);
                 //注意：如果对方没有打开相应端口，会抛出IOException
                 Socket socket = new Socket(otherIp, Constant.CHAT_PORT);
 
                 ChatClient chatClient = new ChatClient(socket, chatData);
                 new Thread(chatClient).start();
-
-//                mHandler.obtainMessage(MESSAGE_SEND_SUCCESS).sendToTarget();
 
             } catch (UnknownHostException e) {
                 Log.d(TAG, "UnknownHostException : " + e.getMessage());

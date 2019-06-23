@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,12 +18,12 @@ import com.feng.p2planchat.adapter.ChatAdapter;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IChatContract;
+import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
 import com.feng.p2planchat.entity.serializable.ChatData;
-import com.feng.p2planchat.entity.eventbus.ChatEvent;
 import com.feng.p2planchat.entity.eventbus.Event;
-import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.presenter.ChatPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
+import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
 
@@ -177,12 +178,16 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         //先判断是否需要显示时间
         String currTime = chatData.getTime();
         if (mLastTime.equals("") || TimeUtil.getTimeInterval(mLastTime, currTime) >= 3) {
-            mChatDataList.add(new ChatData(currTime));
+            mChatDataList.add(new ChatData(chatData.getIp(), currTime));
         }
         mLastTime = currTime;
         //添加信息
         mChatDataList.add(chatData);
         mChatAdapter.notifyDataSetChanged();
+//        //发送消息给用户列表界面
+//        Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
+//                new ChatDataEvent(mChatDataList));
+//        EventBusUtil.sendEvent(chatDataEvent);
     }
 
     /**
@@ -201,11 +206,16 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onStickyChatEventCome(Event<ChatEvent> event) {
+    public void onStickyChatEventCome(Event<ChatDataEvent> event) {
+        Log.d(TAG, "onStickyChatEventCome: run");
+        Log.d(TAG, "onStickyChatEventCome: event.getCode()" + event.getCode());
         switch (event.getCode()) {
             case EventBusCode.USER_LIST_2_CHAT:
-                mOtherName = event.getData().getOtherName();
-                mOtherIp = event.getData().getOtherIp();
+                Log.d(TAG, "onStickyChatEventCome: run 2");
+                mOtherName = event.getData().getName();
+                mOtherIp = event.getData().getIp();
+                System.out.println("mOtherName = " + mOtherName + ", mOtherIp = " + mOtherIp);
+                mChatDataList = event.getData().getChatDataList();
                 break;
             default:
                 break;
@@ -219,7 +229,8 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
      * @return
      */
     private ChatData getSendTextChatData(String content) {
-        return new ChatData(UserUtil.readFromInternalStorage(this).getUserName(),
+        return new ChatData(UserUtil.readFromInternalStorage(this).getIpAddress(),
+                UserUtil.readFromInternalStorage(this).getUserName(),
                 BitmapUtil.bitmap2ByteArray(mOwnHeadImage), content,
                 TimeUtil.getCurrTime(), ChatData.SEND_TEXT);
     }
