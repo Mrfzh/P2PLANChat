@@ -61,7 +61,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         userViewHolder.headImage.setImageBitmap(mUserDataList.get(i).getHeadImage());
         userViewHolder.name.setText(mUserDataList.get(i).getName());
         userViewHolder.content.setText(mUserDataList.get(i).getContent());
-        userViewHolder.time.setText(mUserDataList.get(i).getTime());
+//        userViewHolder.time.setText(mUserDataList.get(i).getTime());
+
+        String time = mUserDataList.get(i).getTime();
+        if (time.equals("")) {
+            userViewHolder.time.setText(time);
+        } else {
+            String when;
+            int hour = Integer.parseInt(time.substring(0, 2));
+            if (hour < 12 && hour >= 6) {
+                when = "早上";
+            } else if (hour < 18 && hour >= 12) {
+                when = "下午";
+            } else if (hour < 24 && hour >= 18) {
+                when = "晚上";
+            } else {
+                when = "凌晨";
+            }
+            userViewHolder.time.setText(when + (hour % 12) + time.substring(2, 5));
+        }
     }
 
     @Override

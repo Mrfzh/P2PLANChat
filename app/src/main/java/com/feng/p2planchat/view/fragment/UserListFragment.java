@@ -239,8 +239,11 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatDataEventCome(Event<ChatDataEvent> event) {
+        Log.d(TAG, "onChatDataEventCome: run");
         switch (event.getCode()) {
             case EventBusCode.MAIN_2_USER_LIST:
+                Log.d(TAG, "onChatDataEventCome(case EventBusCode.MAIN_2_USER_LIST): run");
+                //接收单条消息
                 if (!event.getData().isOneData()) {
                     break;
                 }
@@ -263,6 +266,34 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                         //将消息设置为接收类型
                         chatData.setType(ChatData.RECEIVE_TEXT);
                         list.add(chatData);
+
+                        //将新消息发送给聊天界面
+                        Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
+                                new ChatDataEvent(chatData.getName(), chatData.getIp(), list));
+                        EventBusUtil.sendStickyEvent(chatDataEvent);
+                        break;
+                    }
+                }
+                mUserAdapter.notifyDataSetChanged();
+                break;
+            case EventBusCode.CHAT_2_USER_LIST:
+                Log.d(TAG, "onChatDataEventCome(case EventBusCode.CHAT_2_USER_LIST): run");
+                //接收多条消息
+                if (event.getData().isOneData()) {
+                    break;
+                }
+                //收到新消息后（文本信息）
+                List<ChatData> chatDataList = event.getData().getChatDataList();
+                //更新用户列表的最新消息和时间
+                ChatData newChatData = chatDataList.get(chatDataList.size() - 1);
+                Log.d(TAG, "onChatDataEventCome: newIp = " + event.getData().getIp());
+                for (int i = 0; i < mUserDataList.size(); i++) {
+                    UserData curr = mUserDataList.get(i);
+                    //找到当前聊天对象后，更新其用户信息
+                    if (curr.getIp().equals(event.getData().getIp())) {
+                        curr.setTime(newChatData.getTime());
+                        curr.setContent(newChatData.getContent());
+                        curr.setChatDataList(chatDataList);
                         break;
                     }
                 }

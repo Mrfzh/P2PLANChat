@@ -40,7 +40,7 @@
     <color name="color_item_user_name">#303030</color>
     <color name="color_item_user_text">#999999</color>
     <color name="color_item_user_time">#999999</color>
-    <color name="color_item_user_line">#cccccc</color>
+    <color name="color_item_user_line">#dddddd</color>
     <color name="color_item_layout_pressed">#bbbbbb</color>
 
     <color name="color_person_head_image_border">#555555</color>

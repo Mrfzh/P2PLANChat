@@ -184,10 +184,10 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         //添加信息
         mChatDataList.add(chatData);
         mChatAdapter.notifyDataSetChanged();
-//        //发送消息给用户列表界面
-//        Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
-//                new ChatDataEvent(mChatDataList));
-//        EventBusUtil.sendEvent(chatDataEvent);
+        //发送消息给用户列表界面
+        Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
+                new ChatDataEvent(mOtherName, mOtherIp, mChatDataList));
+        EventBusUtil.sendEvent(chatDataEvent);
     }
 
     /**
@@ -207,15 +207,15 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onStickyChatEventCome(Event<ChatDataEvent> event) {
-        Log.d(TAG, "onStickyChatEventCome: run");
-        Log.d(TAG, "onStickyChatEventCome: event.getCode()" + event.getCode());
         switch (event.getCode()) {
             case EventBusCode.USER_LIST_2_CHAT:
-                Log.d(TAG, "onStickyChatEventCome: run 2");
                 mOtherName = event.getData().getName();
                 mOtherIp = event.getData().getIp();
-                System.out.println("mOtherName = " + mOtherName + ", mOtherIp = " + mOtherIp);
                 mChatDataList = event.getData().getChatDataList();
+                //如果这时是在聊天界面，更新消息
+                if (mChatAdapter != null) {
+                    mChatAdapter.notifyDataSetChanged();
+                }
                 break;
             default:
                 break;

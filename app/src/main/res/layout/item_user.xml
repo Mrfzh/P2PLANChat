@@ -26,7 +26,7 @@
         android:text="小王"
         android:textSize="16sp"
         android:layout_toEndOf="@id/iv_item_user_head_image"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:textColor="@color/color_item_user_name"/>
 
     <TextView
@@ -34,10 +34,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="聊天内容"
-        android:textSize="12sp"
+        android:textSize="10.5sp"
         android:layout_toEndOf="@id/iv_item_user_head_image"
         android:layout_below="@id/tv_item_user_name"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="4dp"
         android:textColor="@color/color_item_user_text"/>
 
     <TextView
@@ -45,15 +45,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="早上9:16"
-        android:textSize="12sp"
+        android:textSize="10.5sp"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:textColor="@color/color_item_user_time"/>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.1dp"
+        android:layout_height="0.05dp"
         android:layout_marginStart="70dp"
         android:layout_alignParentBottom="true"
         android:background="@color/color_item_user_line"/>

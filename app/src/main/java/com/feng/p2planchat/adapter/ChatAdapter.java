@@ -60,12 +60,18 @@ public class ChatAdapter extends RecyclerView.Adapter {
         } else if (viewHolder instanceof TimeViewHolder) {
             TimeViewHolder timeViewHolder = (TimeViewHolder) viewHolder;
             String time = mChatDataList.get(i).getTime();
-            String when = "";
+            String when;
             int hour = Integer.parseInt(time.substring(0, 2));
             if (hour < 12 && hour >= 6) {
                 when = "早上";
+            } else if (hour < 18 && hour >= 12) {
+                when = "下午";
+            } else if (hour < 24 && hour >= 18) {
+                when = "晚上";
+            } else {
+                when = "凌晨";
             }
-            timeViewHolder.time.setText(when + time.substring(0, 5));
+            timeViewHolder.time.setText(when + (hour % 12) + time.substring(2, 5));
         }
     }
 
