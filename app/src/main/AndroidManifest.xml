@@ -16,9 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".view.test.Test3Activity">
+        <activity android:name=".view.test.Test4Activity">
 
         </activity>
+        <activity android:name=".view.test.Test3Activity"></activity>
         <activity android:name=".view.activity.ChatActivity">
 
         </activity>

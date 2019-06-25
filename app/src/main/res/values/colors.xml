@@ -79,4 +79,6 @@
     <color name="color_chat_more_function_image_bg_after_pressed">#e1e1e1</color>
     <color name="color_chat_time">#aaaaaa</color>
 
+    <color name="color_progress_bar_bg">#e1e1e1</color>
+
 </resources>

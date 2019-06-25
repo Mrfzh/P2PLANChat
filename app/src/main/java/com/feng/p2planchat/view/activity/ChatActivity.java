@@ -82,8 +82,25 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
         mChatRv = findViewById(R.id.rv_chat_list);
         mChatRv.setLayoutManager(new LinearLayoutManager(this));
+        //如果软键盘弹出后遮挡了item，就将RV滑动到最后
+        mChatRv.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if(bottom < oldBottom){
+                    mChatRv.postDelayed(new Runnable(){
+                        @Override
+                        public void run() {
+                            mChatRv.scrollToPosition(mChatDataList.size() -1);
+                        }
+                    },100);
+                }
+            }
+        });
         initAdapter();
         mChatRv.setAdapter(mChatAdapter);
+        //消息滑动到最后
+        mChatRv.scrollToPosition(mChatDataList.size() -1);
 
         mMoreFunctionRv = findViewById(R.id.rv_chat_more_function);
 
@@ -184,6 +201,8 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         //添加信息
         mChatDataList.add(chatData);
         mChatAdapter.notifyDataSetChanged();
+        //防止软键盘遮挡
+        mChatRv.scrollToPosition(mChatDataList.size() -1);
         //发送消息给用户列表界面
         Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
                 new ChatDataEvent(mOtherName, mOtherIp, mChatDataList));
@@ -215,6 +234,8 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                 //如果这时是在聊天界面，更新消息
                 if (mChatAdapter != null) {
                     mChatAdapter.notifyDataSetChanged();
+                    //消息滑动到最后
+                    mChatRv.scrollToPosition(mChatDataList.size() -1);
                 }
                 break;
             default:

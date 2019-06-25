@@ -31,6 +31,7 @@ import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.PictureUtil;
+import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 import java.util.ArrayList;
@@ -115,6 +116,8 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
             //点击进入
             case R.id.tv_register_enter:
                 mProgressBar.setVisibility(View.VISIBLE);
+                //隐藏软键盘
+                SoftKeyboardUtil.hideSoftKeyboard(this);
                 //延时注册，不然会直接卡住
                 new Handler().postDelayed(new Runnable() {
                     @Override

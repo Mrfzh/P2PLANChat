@@ -15,6 +15,7 @@ import com.feng.p2planchat.base.BasePresenter;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
+import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 import java.util.UUID;
@@ -84,6 +85,8 @@ public class ModifyPasswordActivity extends BaseActivity implements View.OnClick
                 break;
             case R.id.tv_modify_password_modify:
                 mProgressBar.setVisibility(View.VISIBLE);
+                //隐藏软键盘
+                SoftKeyboardUtil.hideSoftKeyboard(this);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {

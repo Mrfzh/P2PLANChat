@@ -16,6 +16,7 @@ import com.feng.p2planchat.db.AccountDatabaseHelper;
 import com.feng.p2planchat.db.AccountOperation;
 import com.feng.p2planchat.presenter.ModifyNamePresenter;
 import com.feng.p2planchat.util.OtherUserIpUtil;
+import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.UserUtil;
 
 public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
@@ -85,6 +86,8 @@ public class ModifyNameActivity extends BaseActivity<ModifyNamePresenter>
             case R.id.tv_modify_name_modify:
                 //更改用户名
                 mProgressBar.setVisibility(View.VISIBLE);
+                //隐藏软键盘
+                SoftKeyboardUtil.hideSoftKeyboard(this);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {

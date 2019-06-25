@@ -29,6 +29,7 @@ import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.OtherUserIpUtil;
+import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.widget.TipDialog;
 
@@ -103,6 +104,8 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
             case R.id.tv_login_login:
                 //显示进度
                 mProgressBar.setVisibility(View.VISIBLE);
+                //隐藏软键盘
+                SoftKeyboardUtil.hideSoftKeyboard(this);
                 //延时登录，不然会直接卡住
                 new Handler().postDelayed(new Runnable() {
                     @Override

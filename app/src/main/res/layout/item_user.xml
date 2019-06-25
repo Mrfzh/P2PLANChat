@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:minHeight="70dp"
@@ -8,7 +9,7 @@
     android:clickable="true"
     android:focusable="true">
 
-    <ImageView
+    <com.feng.p2planchat.widget.RoundAngleImageView
         android:id="@+id/iv_item_user_head_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -17,7 +18,8 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:src="@drawable/head_image0"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        app:radius = "5dp"/>
 
     <TextView
         android:id="@+id/tv_item_user_name"
