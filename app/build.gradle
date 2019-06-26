@@ -34,4 +34,7 @@ dependencies {
 
     //EventBus
     implementation 'org.greenrobot:eventbus:3.0.0'
+
+    //角标
+    implementation 'q.rorbin:badgeview:1.1.3'
 }

@@ -19,6 +19,7 @@ public class UserData {
     private String content;     //最近聊天内容
     private String time;        //最近聊天时间
     private List<ChatData> chatDataList;    //聊天消息集合
+    private int unreadMessageNum;   //未读消息数
 
     public UserData(Bitmap headImage, String name, String ip) {
         this.headImage = headImage;
@@ -27,6 +28,7 @@ public class UserData {
         this.content = "";
         this.time = "";
         this.chatDataList = new ArrayList<>();
+        unreadMessageNum = 0;
     }
 
     public Bitmap getHeadImage() {
@@ -75,6 +77,14 @@ public class UserData {
 
     public void setChatDataList(List<ChatData> chatDataList) {
         this.chatDataList = chatDataList;
+    }
+
+    public int getUnreadMessageNum() {
+        return unreadMessageNum;
+    }
+
+    public void setUnreadMessageNum(int unreadMessageNum) {
+        this.unreadMessageNum = unreadMessageNum;
     }
 
     @Override

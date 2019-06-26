@@ -26,12 +26,14 @@ import com.feng.p2planchat.entity.eventbus.UpdateOtherHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateOtherNameEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
 import com.feng.p2planchat.presenter.UserListPresenter;
+import com.feng.p2planchat.util.ActivityUtil;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.view.activity.ChatActivity;
+import com.feng.p2planchat.view.activity.MainActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -260,6 +262,14 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                         Log.d(TAG, "onChatDataEventCome: chatData.getContent() = " + chatData.getContent());
                         curr.setTime(chatData.getTime());
                         curr.setContent(chatData.getContent());
+
+                        //只要当前界面不是聊天界面，都更新消息提醒数
+                        if (ActivityUtil.isActivityTop(ChatActivity.class, getContext())) {
+                            curr.setUnreadMessageNum(0);
+                        } else {
+                            curr.setUnreadMessageNum(curr.getUnreadMessageNum() + 1);
+                        }
+
                         //更新聊天消息
                         List<ChatData> list = curr.getChatDataList();
                         //判断是否要显示时间
@@ -326,10 +336,16 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
             @Override
             public void clickItem(int position) {
                 //点击item后，和对方进行聊天
+
                 UserData userData = mUserDataList.get(position);
                 Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
                         new ChatDataEvent(userData.getName(), userData.getIp(), userData.getChatDataList()));
                 EventBusUtil.sendStickyEvent(chatDataEvent);
+
+                //清除消息提醒
+                mUserDataList.get(position).setUnreadMessageNum(0);
+                mUserAdapter.notifyDataSetChanged();
+
                 jump2Activity(ChatActivity.class);
             }
         });

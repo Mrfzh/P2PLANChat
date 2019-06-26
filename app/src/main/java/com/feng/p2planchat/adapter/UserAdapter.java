@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,11 @@ import android.widget.TextView;
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.entity.data.UserData;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import q.rorbin.badgeview.Badge;
+import q.rorbin.badgeview.QBadgeView;
 
 /**
  * @author Feng Zhaohao
@@ -24,6 +29,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private Context mContext;
     private List<UserData> mUserDataList;
+    private List<Badge> mBadgeList = new ArrayList<>();
 
     private OnClickListener mOnClickListener;
 
@@ -61,8 +67,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         userViewHolder.headImage.setImageBitmap(mUserDataList.get(i).getHeadImage());
         userViewHolder.name.setText(mUserDataList.get(i).getName());
         userViewHolder.content.setText(mUserDataList.get(i).getContent());
-//        userViewHolder.time.setText(mUserDataList.get(i).getTime());
-
+        //设置时间
         String time = mUserDataList.get(i).getTime();
         if (time.equals("")) {
             userViewHolder.time.setText(time);
@@ -80,6 +85,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             }
             userViewHolder.time.setText(when + (hour % 12) + time.substring(2, 5));
         }
+
+        //绑定角标
+        if (mBadgeList.size() == i) {
+            mBadgeList.add(new QBadgeView(mContext).bindTarget(userViewHolder.badge)
+                    .setBadgeNumber(mUserDataList.get(i).getUnreadMessageNum())
+                    .setBadgeGravity(Gravity.CENTER));
+        } else {
+            mBadgeList.get(i).setBadgeNumber(mUserDataList.get(i).getUnreadMessageNum());
+        }
+
     }
 
     @Override
@@ -94,6 +109,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         TextView name;
         TextView content;
         TextView time;
+        View badge;
 
         UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -102,6 +118,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             name = itemView.findViewById(R.id.tv_item_user_name);
             content = itemView.findViewById(R.id.tv_item_user_content);
             time = itemView.findViewById(R.id.tv_item_user_time);
+            badge = itemView.findViewById(R.id.v_item_user_badge);
         }
     }
 }
