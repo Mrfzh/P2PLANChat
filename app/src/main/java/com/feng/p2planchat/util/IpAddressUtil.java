@@ -113,8 +113,9 @@ public class IpAddressUtil {
                     } catch (InterruptedException e2) {
                         e2.printStackTrace();
                     } finally {
-                        assert proc != null;
-                        proc.destroy();
+                        if (proc != null) {
+                            proc.destroy();
+                        }
                     }
                 }
             }).start();

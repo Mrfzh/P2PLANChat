@@ -16,4 +16,5 @@ public class EventBusCode {
     public static final int DELETE_USER = 9;
     public static final int USER_LIST_2_CHAT = 10;
     public static final int CHAT_2_USER_LIST = 11;
+    public static final int MAIN_2_USER_LIST_CHAT_DATA = 12;
 }

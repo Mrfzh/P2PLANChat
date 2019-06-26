@@ -61,6 +61,7 @@ public class RegisterModel implements IRegisterContract.Model{
 
         while (!isFinish) {
             //循环，等待线程结束
+            Log.d(TAG, "register: run 1");
         }
 
         Log.d(TAG, "register: run");
@@ -93,6 +94,7 @@ public class RegisterModel implements IRegisterContract.Model{
                 }
                 while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
                     //循环，等待线程结束
+                    Log.d(TAG, "run: run 2");
                 }
                 isFinish = true;
             } catch (UnknownHostException e) {

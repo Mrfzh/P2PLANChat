@@ -61,8 +61,10 @@ public class LoginModel implements ILoginContract.Model {
         Thread thread = new Thread(new LoginClientThread());
         thread.start();
 
+        //这里设定一个超时时间（因为一些未知原因，可以会一直循环）
         while (!isFinish) {
             //循环，等待线程结束
+            Log.d(TAG, "login: run 1");
         }
 
         mPresenter.loginSuccess(mUserList);
@@ -99,6 +101,7 @@ public class LoginModel implements ILoginContract.Model {
                 }
                 while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
                     //循环，等待线程结束
+                    Log.d(TAG, "run: run 2");
                 }
                 isFinish = true;
             } catch (UnknownHostException e) {

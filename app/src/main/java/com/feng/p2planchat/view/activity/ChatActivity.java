@@ -24,6 +24,7 @@ import com.feng.p2planchat.entity.eventbus.Event;
 import com.feng.p2planchat.presenter.ChatPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
 
@@ -52,7 +53,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     private List<ChatData> mChatDataList = new ArrayList<>();
     private ChatAdapter mChatAdapter;
 
-    private String mLastTime = "";   //上一发送消息的时间（双方对话间隔3分钟以上时才显示时间）
+    private static String LAST_TIME = "";   //上一发送消息的时间（双方对话间隔3分钟以上时才显示时间）
 
     @Override
     protected void doBeforeSetContentView() {
@@ -167,6 +168,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                 mMoreFunctionRv.setVisibility(View.VISIBLE);
                 break;
             case R.id.iv_chat_back:
+                SoftKeyboardUtil.hideSoftKeyboard(this);
                 finish();
                 break;
             case R.id.tv_chat_send_text:
@@ -194,10 +196,10 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         //更新列表
         //先判断是否需要显示时间
         String currTime = chatData.getTime();
-        if (mLastTime.equals("") || TimeUtil.getTimeInterval(mLastTime, currTime) >= 3) {
+        if (LAST_TIME.equals("") || TimeUtil.getTimeInterval(LAST_TIME, currTime) >= 3) {
             mChatDataList.add(new ChatData(chatData.getIp(), currTime));
         }
-        mLastTime = currTime;
+        LAST_TIME = currTime;
         //添加信息
         mChatDataList.add(chatData);
         mChatAdapter.notifyDataSetChanged();
@@ -231,6 +233,8 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                 mOtherName = event.getData().getName();
                 mOtherIp = event.getData().getIp();
                 mChatDataList = event.getData().getChatDataList();
+                //获取上一次聊天时间
+                LAST_TIME = mChatDataList.get(mChatDataList.size() - 1).getTime();
                 //如果这时是在聊天界面，更新消息
                 if (mChatAdapter != null) {
                     mChatAdapter.notifyDataSetChanged();

@@ -76,4 +76,9 @@ public class UserData {
     public void setChatDataList(List<ChatData> chatDataList) {
         this.chatDataList = chatDataList;
     }
+
+    @Override
+    public String toString() {
+        return "time = " + this.time + ", content = " + this.content;
+    }
 }

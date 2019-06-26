@@ -1,6 +1,7 @@
 package com.feng.p2planchat.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.feng.p2planchat.client.LoginClient;
 import com.feng.p2planchat.config.Constant;
@@ -21,6 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created on 2019/6/13
  */
 public class UserListModel implements IUserListContract.Model {
+
+    private static final String TAG = "fzh";
 
     private IUserListContract.Presenter mPresenter;
 
@@ -58,9 +61,11 @@ public class UserListModel implements IUserListContract.Model {
 
         while (!isFinish) {
             //循环，等待线程结束
+            Log.d(TAG, "findOtherUser: run 1");
         }
 
         mPresenter.findOtherUserSuccess(mUserList);
+        mUserList = new ArrayList<>();      //清除信息
     }
 
     class LoginClientThread implements Runnable {
@@ -88,6 +93,7 @@ public class UserListModel implements IUserListContract.Model {
                 }
                 while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
                     //循环，等待线程结束
+                    Log.d(TAG, "run: run 2");
                 }
                 isFinish = true;
             } catch (UnknownHostException e) {

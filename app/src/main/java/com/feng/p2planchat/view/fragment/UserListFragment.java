@@ -159,8 +159,10 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUserListEventCome(Event<UserListEvent> event) {
+        Log.d(TAG, "onUserListEventCome: run");
         switch (event.getCode()) {
             case EventBusCode.MAIN_2_USER_LIST:
+                Log.d(TAG, "onUserListEventCome(EventBusCode.MAIN_2_USER_LIST): run");
                 if (event.getData().isOneUser()) {
                     //有新用户上线
                     hasNewUser(event.getData().getNewUser());
@@ -241,7 +243,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     public void onChatDataEventCome(Event<ChatDataEvent> event) {
         Log.d(TAG, "onChatDataEventCome: run");
         switch (event.getCode()) {
-            case EventBusCode.MAIN_2_USER_LIST:
+            case EventBusCode.MAIN_2_USER_LIST_CHAT_DATA:
                 Log.d(TAG, "onChatDataEventCome(case EventBusCode.MAIN_2_USER_LIST): run");
                 //接收单条消息
                 if (!event.getData().isOneData()) {
@@ -254,6 +256,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                 for (int i = 0; i < mUserDataList.size(); i++) {
                     UserData curr = mUserDataList.get(i);
                     if (curr.getIp().equals(ip)) {
+                        Log.d(TAG, "onChatDataEventCome: chatData.getTime() = " + chatData.getTime());
+                        Log.d(TAG, "onChatDataEventCome: chatData.getContent() = " + chatData.getContent());
                         curr.setTime(chatData.getTime());
                         curr.setContent(chatData.getContent());
                         //更新聊天消息
@@ -267,14 +271,22 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                         chatData.setType(ChatData.RECEIVE_TEXT);
                         list.add(chatData);
 
+                        mUserAdapter.notifyDataSetChanged();
+
+                        Log.d(TAG, "onChatDataEventCome: run 2");
+
+                        Log.d(TAG, "onChatDataEventCome: curr.getContent = " + curr.getContent());
+                        Log.d(TAG, "onChatDataEventCome: curr.getTime = " + curr.getTime());
+
                         //将新消息发送给聊天界面
                         Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
                                 new ChatDataEvent(chatData.getName(), chatData.getIp(), list));
                         EventBusUtil.sendStickyEvent(chatDataEvent);
+
                         break;
                     }
                 }
-                mUserAdapter.notifyDataSetChanged();
+//                mUserAdapter.notifyDataSetChanged();
                 break;
             case EventBusCode.CHAT_2_USER_LIST:
                 Log.d(TAG, "onChatDataEventCome(case EventBusCode.CHAT_2_USER_LIST): run");
@@ -329,13 +341,20 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
      * @param user 用户信息
      */
     private void hasNewUser(User user) {
+        Log.d(TAG, "hasNewUser: run");
+        Log.d(TAG, "hasNewUser: user = " + user);
+        Log.d(TAG, "hasNewUser: mUserIpSet = " + mUserIpSet);
+        Log.d(TAG, "hasNewUser: user.getIpAddress = " + user.getIpAddress());
         //如果该用户不在列表，添加进列表
         if (!mUserIpSet.contains(user.getIpAddress())) {
+            Log.d(TAG, "hasNewUser: run 1");
             //更新用户列表
             Bitmap headImage = BitmapUtil.byteArray2Bitmap(user.getHeadImage());
             String name = user.getUserName();
             String ip = user.getIpAddress();
-            mUserDataList.add(new UserData(headImage, name, ip));
+            UserData userData = new UserData(headImage, name, ip);
+            Log.d(TAG, "hasNewUser: userData = " + userData);
+            mUserDataList.add(userData);
             mUserAdapter.notifyDataSetChanged();
             //隐藏掉无人页面
             mNothingTv.setVisibility(View.GONE);
@@ -367,8 +386,13 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     public void findOtherUserSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
 
+        Log.d(TAG, "findOtherUserSuccess: userList = " + userList);
+
         if (userList.size() == 0) {
-            mUserDataList = new ArrayList<>();
+            //重置集合
+            mUserDataList.clear();
+            mUserIpSet.clear();
+            //更新列表
             mUserAdapter.notifyDataSetChanged();
             //显示无人页面
             mNothingTv.setVisibility(View.VISIBLE);
@@ -387,6 +411,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         OtherUserIpUtil.write2InternalStorage(new OtherUserIp(otherUserIpList), getContext());
 
         //将不在列表的用户添加进列表
+        Log.d(TAG, "findOtherUserSuccess: mUserIpSet = " + mUserIpSet);
         for (int i = 0; i < userList.size(); i++) {
             User curr = userList.get(i);
             if (curr == null) {

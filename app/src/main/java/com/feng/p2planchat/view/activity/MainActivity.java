@@ -1,9 +1,6 @@
 package com.feng.p2planchat.view.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -17,24 +14,26 @@ import com.feng.p2planchat.R;
 import com.feng.p2planchat.adapter.MainViewPagerAdapter;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
+import com.feng.p2planchat.client.UpdateClient;
 import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
-import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
-import com.feng.p2planchat.entity.eventbus.LogoutEvent;
-import com.feng.p2planchat.entity.serializable.User;
-import com.feng.p2planchat.entity.serializable.UpdateUser;
 import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.eventbus.LogoutEvent;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateOtherHeadImageEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateOtherNameEvent;
 import com.feng.p2planchat.entity.eventbus.UserListEvent;
+import com.feng.p2planchat.entity.serializable.ChatData;
+import com.feng.p2planchat.entity.serializable.UpdateUser;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.service.HandleChatService;
 import com.feng.p2planchat.service.HandleLoginService;
 import com.feng.p2planchat.service.HandleUpdateService;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.OtherUserIpUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.view.fragment.PersonFragment;
 import com.feng.p2planchat.view.fragment.UserListFragment;
@@ -45,6 +44,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +52,6 @@ import java.util.Objects;
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "fzh";
-    private static final int UPDATE_USER_LIST = 1;
 
     private TabLayout mBottomTabTv;
     private ViewPager mContentVp;
@@ -61,30 +60,10 @@ public class MainActivity extends BaseActivity {
     private List<String> mTabTitleList = new ArrayList<>();
 
     private List<User> mUserList = new ArrayList<>();   //在线用户列表
-//    private User mOwnInfo;      //自己的用户信息
 
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case UPDATE_USER_LIST:
-                    StringBuilder builder = new StringBuilder();
-                    for (int i = 0; i < mUserList.size(); i++) {
-                        User curr = mUserList.get(i);
-                        builder.append("用户名：");
-                        builder.append(curr.getUserName());
-                        builder.append(", 用户IP地址：");
-                        builder.append(curr.getIpAddress());
-                        builder.append("\n");
-                    }
-                    Log.d(TAG, "handleMessage: " + builder.toString());
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
+    private LoginServiceThread mLoginServiceThread;
+    private UpdateServiceThread mUpdateServiceThread;
+    private ChatServiceThread mChatServiceThread;
 
     @Override
     protected void doBeforeSetContentView() {
@@ -169,15 +148,31 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void doInOnCreate() {
         //打开服务器端，随时接收其他用户的登录信息
-        new Thread(new LoginServiceThread()).start();
+        mLoginServiceThread = new LoginServiceThread();
+        mLoginServiceThread.start();
 
         //打开服务器端，随机接收其他用户的信息更新
-        new Thread(new UpdateServiceThread()).start();
+        mUpdateServiceThread = new UpdateServiceThread();
+        mUpdateServiceThread.start();
 
         //打开服务器，随时接受其他用户的聊天信息
-        new Thread(new ChatServiceThread()).start();
+        mChatServiceThread = new ChatServiceThread();
+        mChatServiceThread.start();
 
         showInfo();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: run");
+        //退出主活动时，通知其他用户
+        logoutAndNotify();
+        //结束创建的线程
+        mLoginServiceThread.close();
+        mUpdateServiceThread.close();
+        mChatServiceThread.close();
+
+        super.onDestroy();
     }
 
     /**
@@ -210,17 +205,21 @@ public class MainActivity extends BaseActivity {
         Log.d(TAG, "otherInfo: " + builder.toString());
     }
 
-    class LoginServiceThread implements Runnable {
+    class LoginServiceThread extends Thread {
+
+        private ServerSocket userServerSocket;
 
         @Override
         public void run() {
             try {
+
                 //作为服务端，监听其他用户的登录信息
-                ServerSocket userServerSocket = new ServerSocket(Constant.USER_PORT);
+                userServerSocket = new ServerSocket(Constant.USER_PORT);
 
                 //一直监听客户端
                 while (true) {
                     Socket socket = userServerSocket.accept();
+                    Log.d(TAG, "MainActivity: userServerSocket.accept()");
                     //处理客户端的请求
                     HandleLoginService service = new HandleLoginService(socket,
                             UserUtil.readFromInternalStorage(MainActivity.this));
@@ -235,19 +234,31 @@ public class MainActivity extends BaseActivity {
                     });
                     new Thread(service).start();
                 }
+
+            } catch (IOException e) {
+                Log.d(TAG, "MainActivity.LoginServiceThread.IOException = " + e.toString());
+            }
+        }
+
+        public void close() {
+            Log.d(TAG, "MainActivity.LoginServiceThread.close: run");
+            try {
+                userServerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    class UpdateServiceThread implements Runnable {
+    class UpdateServiceThread extends Thread {
+
+        private ServerSocket updateServerSocket;
 
         @Override
         public void run() {
             try {
                 //作为服务端，监听其他用户的登录信息
-                ServerSocket updateServerSocket = new ServerSocket(Constant.UPDATE_PORT);
+                updateServerSocket = new ServerSocket(Constant.UPDATE_PORT);
 
                 //一直监听客户端
                 while (true) {
@@ -291,19 +302,29 @@ public class MainActivity extends BaseActivity {
                 Log.d(TAG, "UpdateServiceThread.IOException: " + e.toString());
             }
         }
+
+        public void close() {
+            try {
+                updateServerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    class ChatServiceThread implements Runnable {
+    class ChatServiceThread extends Thread {
+
+        private ServerSocket chatServerSocket;
 
         @Override
         public void run() {
             try {
                 //作为服务端，监听其他用户的登录信息
-                ServerSocket userServerSocket = new ServerSocket(Constant.CHAT_PORT);
+                chatServerSocket = new ServerSocket(Constant.CHAT_PORT);
 
                 //一直监听客户端
                 while (true) {
-                    Socket socket = userServerSocket.accept();
+                    Socket socket = chatServerSocket.accept();
                     //处理客户端的请求
                     HandleChatService service = new HandleChatService(socket);
                     service.setHandleChatServiceListener(new HandleChatService.HandleChatServiceListener() {
@@ -311,13 +332,21 @@ public class MainActivity extends BaseActivity {
                         public void getMessage(ChatData chatData) {
                             Log.d(TAG, "getMessage: " + chatData);
                             //将新消息发送给用户列表界面
-                            Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST,
+                            Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.MAIN_2_USER_LIST_CHAT_DATA,
                                     new ChatDataEvent(chatData));
                             EventBusUtil.sendEvent(chatDataEvent);
                         }
                     });
                     new Thread(service).start();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void close() {
+            try {
+                chatServerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -390,5 +419,45 @@ public class MainActivity extends BaseActivity {
                     .getColor(R.color.color_main_tab_text_before_pressed));
         }
         return view;
+    }
+
+    /**
+     * 退出登录并通知其他用户
+     */
+    private void logoutAndNotify() {
+        new Thread(new UpdateClientThread(OtherUserIpUtil.readFromInternalStorage(this)
+                .getOtherUserIpList(), new UpdateUser(UserUtil
+                .readFromInternalStorage(this).getIpAddress()))).start();
+    }
+
+    class UpdateClientThread implements Runnable {
+
+        private List<String> mOtherUserIpList = new ArrayList<>();
+        private UpdateUser mUpdateInfo;
+
+        public UpdateClientThread(List<String> mOtherUserIpList, UpdateUser mUpdateInfo) {
+            this.mOtherUserIpList = mOtherUserIpList;
+            this.mUpdateInfo = mUpdateInfo;
+        }
+
+        @Override
+        public void run() {
+            try {
+                //给每个在线用户发出请求
+                for (int i = 0; i < mOtherUserIpList.size(); i++) {
+
+                    Log.d(TAG, "UpdateClientThread: " + mOtherUserIpList.get(i));
+
+                    //注意：如果对方没有打开相应端口，会抛出IOException
+                    Socket socket = new Socket(mOtherUserIpList.get(i), Constant.UPDATE_PORT);
+                    UpdateClient updateClient = new UpdateClient(socket, mUpdateInfo);
+                    new Thread(updateClient).start();
+                }
+            } catch (UnknownHostException e) {
+                Log.d(TAG, "UnknownHostException : " + e.getMessage());
+            } catch (IOException e) {
+                Log.d(TAG, "IOException : " + e.getMessage());
+            }
+        }
     }
 }
