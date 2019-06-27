@@ -65,6 +65,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     private UserAdapter mUserAdapter;
     //保存当前在线的用户名的IP地址
     private HashSet<String> mUserIpSet = new HashSet<>();
+    //是否正在刷新
+    private boolean mIsRefreshing = false;
 
     @Override
     protected void initData() {
@@ -121,14 +123,17 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_user_list_refresh:
-                //更新用户列表
-                mProgressBar.setVisibility(View.VISIBLE);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refresh();
-                    }
-                }, 300);
+                if (!mIsRefreshing) {
+                    mIsRefreshing = true;
+                    //更新用户列表
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            refresh();
+                        }
+                    }, 300);
+                }
                 break;
             default:
                 break;
@@ -401,6 +406,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     @Override
     public void findOtherUserSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+        mIsRefreshing = false;
 
         Log.d(TAG, "findOtherUserSuccess: userList = " + userList);
 
@@ -416,15 +422,16 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         }
 
         //将其他用户的IP地址写入本地
-        List<String> otherUserIpList = new ArrayList<>();
+        HashSet<String> otherUserIpSet = new HashSet<>();
         for (int i = 0; i < userList.size(); i++) {
             User curr = userList.get(i);
             if (curr == null) {
                 continue;
             }
-            otherUserIpList.add(curr.getIpAddress());
+            otherUserIpSet.add(curr.getIpAddress());
         }
-        OtherUserIpUtil.write2InternalStorage(new OtherUserIp(otherUserIpList), getContext());
+        OtherUserIpUtil.write2InternalStorage(new OtherUserIp(
+                new ArrayList<>(otherUserIpSet)), getContext());
 
         //将不在列表的用户添加进列表
         Log.d(TAG, "findOtherUserSuccess: mUserIpSet = " + mUserIpSet);
@@ -447,6 +454,8 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
         mUserAdapter.notifyDataSetChanged();
         //隐藏掉无人页面
         mNothingTv.setVisibility(View.GONE);
+
+
     }
 
     /**
@@ -458,5 +467,6 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
     public void findOtherUserError(String errorMsg) {
         mProgressBar.setVisibility(View.GONE);
         showShortToast(errorMsg);
+        mIsRefreshing = false;
     }
 }

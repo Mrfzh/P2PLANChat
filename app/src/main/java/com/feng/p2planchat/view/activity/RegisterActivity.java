@@ -54,6 +54,7 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
     private User mOwnInfo;      //自己的用户信息
 
     private AccountOperation mAccountOperation;     //数据库操作
+    private boolean mIsEnter = false;       //是否正在登入
 
     @Override
     protected void doBeforeSetContentView() {
@@ -115,16 +116,19 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
                 break;
             //点击进入
             case R.id.tv_register_enter:
-                mProgressBar.setVisibility(View.VISIBLE);
-                //隐藏软键盘
-                SoftKeyboardUtil.hideSoftKeyboard(this);
-                //延时注册，不然会直接卡住
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        register(mNameEt.getText().toString(), mPasswordEt.getText().toString());
-                    }
-                }, 300);
+                if (!mIsEnter) {
+                    mIsEnter = true;
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    //隐藏软键盘
+                    SoftKeyboardUtil.hideSoftKeyboard(this);
+                    //延时注册，不然会直接卡住
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            register(mNameEt.getText().toString(), mPasswordEt.getText().toString());
+                        }
+                    }, 300);
+                }
                 break;
             default:
                 break;
@@ -256,6 +260,8 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
         }
         Log.d(TAG, "registerSuccess: " + builder.toString());
 
+        mIsEnter = false;
+
         //跳转到主活动
         jumpToNewActivity(MainActivity.class);
         finish();
@@ -268,6 +274,7 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter>
      */
     @Override
     public void registerError(String errorMsg) {
+        mIsEnter = false;
         mProgressBar.setVisibility(View.GONE);
         showShortToast(errorMsg);
     }

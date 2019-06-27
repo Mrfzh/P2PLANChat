@@ -107,7 +107,6 @@ public class IpAddressUtil {
                             ipAddressList.add(current_ip);
                             Log.d(TAG, current_ip + ": true");
                         }
-                        atomicInteger.incrementAndGet();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     } catch (InterruptedException e2) {
@@ -115,6 +114,7 @@ public class IpAddressUtil {
                     } finally {
                         if (proc != null) {
                             proc.destroy();
+                            atomicInteger.incrementAndGet();
                         }
                     }
                 }

@@ -59,14 +59,19 @@ public class RegisterModel implements IRegisterContract.Model{
         Thread thread = new Thread(new LoginClientThread());
         thread.start();
 
-        while (!isFinish) {
-            //循环，等待线程结束
-            Log.d(TAG, "register: run 1");
+        //这里需要设定一个超时时间（因为一些未知原因，可能会一直循环）
+        long startTime = System.currentTimeMillis();
+        while (!isFinish && ((System.currentTimeMillis() - startTime) <= 15 * 1000)) {
+
         }
 
-        Log.d(TAG, "register: run");
+        if (!isFinish) {
+            mPresenter.registerError("网络请求超时，请重新尝试");
+        } else {
+            mPresenter.registerSuccess(mUserList);
+        }
 
-        mPresenter.registerSuccess(mUserList);
+
     }
 
     class LoginClientThread implements Runnable {
@@ -94,7 +99,6 @@ public class RegisterModel implements IRegisterContract.Model{
                 }
                 while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
                     //循环，等待线程结束
-                    Log.d(TAG, "run: run 2");
                 }
                 isFinish = true;
             } catch (UnknownHostException e) {

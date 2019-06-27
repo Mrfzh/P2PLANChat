@@ -52,6 +52,8 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
     private User mOwnInfo;      //自己的用户信息
     private AccountOperation mAccountOperation;
 
+    private boolean mIsLogining = false;    //是否正在登录
+
     @Override
     protected void doBeforeSetContentView() {
 
@@ -102,17 +104,20 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
         switch (v.getId()) {
             //点击登录
             case R.id.tv_login_login:
-                //显示进度
-                mProgressBar.setVisibility(View.VISIBLE);
-                //隐藏软键盘
-                SoftKeyboardUtil.hideSoftKeyboard(this);
-                //延时登录，不然会直接卡住
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        login(mNameEt.getText().toString(), mPasswordEt.getText().toString());
-                    }
-                }, 300);
+                if (!mIsLogining) {
+                    mIsLogining = true;
+                    //显示进度
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    //隐藏软键盘
+                    SoftKeyboardUtil.hideSoftKeyboard(this);
+                    //延时登录，不然会直接卡住
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            login(mNameEt.getText().toString(), mPasswordEt.getText().toString());
+                        }
+                    }, 300);
+                }
                 break;
             //进行注册
             case R.id.tv_login_register:
@@ -229,6 +234,7 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
     @Override
     public void loginSuccess(List<User> userList) {
         mProgressBar.setVisibility(View.GONE);
+        showShortToast("登录成功");
 
         if (mOwnInfo == null) {
             Log.d(TAG, "mOwnInfo: null");
@@ -281,6 +287,7 @@ public class LoginActivity extends BaseActivity<LoginPresenter>
      */
     @Override
     public void loginError(String errorMsg) {
+        mIsLogining = false;
         mProgressBar.setVisibility(View.GONE);
         showShortToast(errorMsg);
     }

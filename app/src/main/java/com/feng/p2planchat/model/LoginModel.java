@@ -1,6 +1,7 @@
 package com.feng.p2planchat.model;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.feng.p2planchat.client.LoginClient;
@@ -61,13 +62,18 @@ public class LoginModel implements ILoginContract.Model {
         Thread thread = new Thread(new LoginClientThread());
         thread.start();
 
-        //这里设定一个超时时间（因为一些未知原因，可以会一直循环）
-        while (!isFinish) {
-            //循环，等待线程结束
-            Log.d(TAG, "login: run 1");
+        //这里需要设定一个超时时间（因为一些未知原因，可能会一直循环）
+        long startTime = System.currentTimeMillis();
+        while (!isFinish && ((System.currentTimeMillis() - startTime) <= 15 * 1000)) {
+
         }
 
-        mPresenter.loginSuccess(mUserList);
+        if (!isFinish) {
+            mPresenter.loginError("网络请求超时，请重新尝试");
+        } else {
+            mPresenter.loginSuccess(mUserList);
+        }
+        
     }
 
     class LoginClientThread implements Runnable {
@@ -101,7 +107,6 @@ public class LoginModel implements ILoginContract.Model {
                 }
                 while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
                     //循环，等待线程结束
-                    Log.d(TAG, "run: run 2");
                 }
                 isFinish = true;
             } catch (UnknownHostException e) {

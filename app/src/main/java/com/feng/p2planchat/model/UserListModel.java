@@ -53,19 +53,30 @@ public class UserListModel implements IUserListContract.Model {
             return;
         }
 
+        mUserList.clear();      //清除信息
+        //重置参数
+        mAtomicInteger.set(0);
+        mUserNum = 0;
+        isFinish = false;
+
         //作为客户端，向其他在线用户发出广播
         mOwnInfo = user;
         mContext = context;
         Thread thread = new Thread(new LoginClientThread());
         thread.start();
 
-        while (!isFinish) {
-            //循环，等待线程结束
-            Log.d(TAG, "findOtherUser: run 1");
+        //这里需要设定一个超时时间（因为一些未知原因，可能会一直循环）
+        long startTime = System.currentTimeMillis();
+        while (!isFinish && ((System.currentTimeMillis() - startTime) <= 15 * 1000)) {
+
         }
 
-        mPresenter.findOtherUserSuccess(mUserList);
-        mUserList = new ArrayList<>();      //清除信息
+        if (!isFinish) {
+            mPresenter.findOtherUserError("网络请求超时，请重新尝试");
+        } else {
+            Log.d(TAG, "findOtherUser: mUserList.size() = " + mUserList.size());
+            mPresenter.findOtherUserSuccess(mUserList);
+        }
     }
 
     class LoginClientThread implements Runnable {
@@ -73,6 +84,10 @@ public class UserListModel implements IUserListContract.Model {
         @Override
         public void run() {
             try {
+//                Log.d(TAG, "run: mAtomicInteger.get() = " + mAtomicInteger.get());
+//                Log.d(TAG, "run: mUserNum = " + mUserNum);
+//                Log.d(TAG, "run: isFinish = " + isFinish);
+
                 //得到其他在线用户的ip地址
                 List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
 
@@ -93,7 +108,6 @@ public class UserListModel implements IUserListContract.Model {
                 }
                 while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
                     //循环，等待线程结束
-                    Log.d(TAG, "run: run 2");
                 }
                 isFinish = true;
             } catch (UnknownHostException e) {
