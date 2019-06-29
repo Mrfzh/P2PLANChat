@@ -1,7 +1,11 @@
 package com.feng.p2planchat.view.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -21,9 +25,11 @@ import com.feng.p2planchat.contract.IChatContract;
 import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
 import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.presenter.ChatPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.PictureUtil;
 import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
@@ -33,11 +39,13 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ChatActivity extends BaseActivity<ChatPresenter>
         implements View.OnClickListener, IChatContract.View {
 
     public static final String TAG = "fzh";
+    private static final int REQUEST_CHOOSE_PHOTO_FROM_ALBUM = 1;
 
     private TextView mTitleTv;
     private RecyclerView mChatRv;
@@ -46,8 +54,8 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     private TextView mSendTextTv;               //发送按钮（发送文字）
     private ImageView mBackIv;
     private EditText mInputEt;                  //文字输入
+    private ImageView mSendPictureOfAlbumIv;    //从相册中选择图片发送
 
-    private Bitmap mOwnHeadImage;   //自己的头像
     private String mOtherIp;        //对方的IP地址
     private String mOtherName;      //对方的用户名
     private List<ChatData> mChatDataList = new ArrayList<>();
@@ -72,8 +80,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
     @Override
     protected void initData() {
-        mOwnHeadImage = BitmapUtil.readFromInternalStorage(UserUtil
-                .readFromInternalStorage(this).getUserName() + ".jpg", this);
+
     }
 
     @Override
@@ -141,6 +148,9 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                 }
             }
         });
+
+        mSendPictureOfAlbumIv = findViewById(R.id.iv_chat_more_function_album);
+        mSendPictureOfAlbumIv.setOnClickListener(this);
     }
 
     @Override
@@ -158,6 +168,17 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
      */
     private void initAdapter() {
         mChatAdapter = new ChatAdapter(this, mChatDataList);
+        mChatAdapter.setOnChatAdapterListener(new ChatAdapter.OnChatAdapterListener() {
+            @Override
+            public void saveWholeBitmap(Bitmap bitmap) {
+                //保持原图到本地
+                if (BitmapUtil.save2Local(bitmap)) {
+                    showShortToast("保存成功");
+                } else {
+                    showShortToast("保存失败");
+                }
+            }
+        });
     }
 
     @Override
@@ -166,6 +187,8 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
             case R.id.iv_chat_more_function:
                 //显示更多功能布局
                 mMoreFunctionRv.setVisibility(View.VISIBLE);
+                //隐藏软键盘
+                SoftKeyboardUtil.hideSoftKeyboard(this);
                 break;
             case R.id.iv_chat_back:
                 SoftKeyboardUtil.hideSoftKeyboard(this);
@@ -182,6 +205,10 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                         mPresenter.sendText(ChatActivity.this, mOtherIp, getSendTextChatData(message));
                     }
                 }, 100);
+                break;
+            case R.id.iv_chat_more_function_album:
+                //从相册中选择图片发送
+                chooseFromAlbum();
                 break;
             default:
                 break;
@@ -221,6 +248,41 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         showShortToast(errorMsg);
     }
 
+    /**
+     * 发送图片成功
+     *
+     * @param chatData
+     */
+    @Override
+    public void sendPictureSuccess(ChatData chatData) {
+        //更新列表
+        //先判断是否需要显示时间
+        String currTime = chatData.getTime();
+        if (LAST_TIME.equals("") || TimeUtil.getTimeInterval(LAST_TIME, currTime) >= 3) {
+            mChatDataList.add(new ChatData(chatData.getIp(), currTime));
+        }
+        LAST_TIME = currTime;
+        //添加信息
+        mChatDataList.add(chatData);
+        mChatAdapter.notifyDataSetChanged();
+        //防止软键盘遮挡
+        mChatRv.scrollToPosition(mChatDataList.size() -1);
+        //发送消息给用户列表界面
+        Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
+                new ChatDataEvent(mOtherName, mOtherIp, mChatDataList));
+        EventBusUtil.sendEvent(chatDataEvent);
+    }
+
+    /**
+     * 发送图片失败
+     *
+     * @param errorMsg
+     */
+    @Override
+    public void sendPictureError(String errorMsg) {
+        showShortToast(errorMsg);
+    }
+
     @Override
     protected boolean isRegisterEventBus() {
         return true;
@@ -254,9 +316,80 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
      * @return
      */
     private ChatData getSendTextChatData(String content) {
-        return new ChatData(UserUtil.readFromInternalStorage(this).getIpAddress(),
-                UserUtil.readFromInternalStorage(this).getUserName(),
-                BitmapUtil.bitmap2ByteArray(mOwnHeadImage), content,
-                TimeUtil.getCurrTime(), ChatData.SEND_TEXT);
+        User user = UserUtil.readFromInternalStorage(this);
+        if (user != null) {
+            return new ChatData(user.getIpAddress(), user.getUserName(), BitmapUtil
+                    .bitmap2ByteArray(Objects.requireNonNull(BitmapUtil.readFromInternalStorage(
+                            user.getUserName() + ".jpg", this))), content,
+                    TimeUtil.getCurrTime(), ChatData.SEND_TEXT);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 得到发送图片消息的ChatData
+     *
+     * @param bitmap 发送的图片
+     * @return
+     */
+    private ChatData getSendPictureChatData(Bitmap bitmap, Bitmap originalBitmap) {
+        User user = UserUtil.readFromInternalStorage(this);
+        if (user != null) {
+            return new ChatData(user.getIpAddress(), user.getUserName(), BitmapUtil
+                    .bitmap2ByteArray(Objects.requireNonNull(BitmapUtil.readFromInternalStorage(
+                            user.getUserName() + ".jpg", this))),
+                    TimeUtil.getCurrTime(), BitmapUtil.bitmap2ByteArray(bitmap),
+                    BitmapUtil.bitmap2ByteArray(originalBitmap), ChatData.SEND_PICTURE);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 从相册中选择头像
+     */
+    private void chooseFromAlbum() {
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_CHOOSE_PHOTO_FROM_ALBUM);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHOOSE_PHOTO_FROM_ALBUM:
+                String imagePath;
+                if (resultCode == RESULT_OK) {
+                    //判断手机系统版本号，根据版本号对图片选中的图片进行操作
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        //4.4及以上版本
+                        assert data != null;
+                        imagePath = PictureUtil.handleImageOnKitKat(data, this);
+                    } else {
+                        assert data != null;
+                        imagePath = PictureUtil.handleImageBeforeKitKat(data, this);
+                    }
+                    sendPicture(imagePath);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 发送图片给对方
+     */
+    private void sendPicture(final String imagePath) {
+        //发送图片
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.sendPicture(ChatActivity.this, mOtherIp,
+                        getSendPictureChatData(BitmapUtil.compressBitmap(imagePath),
+                                BitmapFactory.decodeFile(imagePath)));
+            }
+        }, 100);
     }
 }

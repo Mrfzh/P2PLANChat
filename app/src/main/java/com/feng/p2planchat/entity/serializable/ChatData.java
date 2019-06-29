@@ -15,6 +15,7 @@ public class ChatData implements Serializable {
     private String content;     //文字消息的内容
     private String time;        //发送时间
     private byte[] picture;     //图片消息的内容
+    private byte[] originalPicture;     //发送图片的原图
     private int type;   //发送的消息类型
 
     //消息类型
@@ -37,12 +38,14 @@ public class ChatData implements Serializable {
 
     //发送或接收图片信息
     public ChatData(String ip, String name, byte[] headImage, String time,
-                    byte[] picture, int type) {
+                    byte[] picture, byte[] originalPicture, int type) {
         this.ip = ip;
         this.name = name;
         this.headImage = headImage;
+        this.content = "[图片]";
         this.time = time;
         this.picture = picture;
+        this.originalPicture = originalPicture;
         this.type = type;
     }
 
@@ -107,6 +110,14 @@ public class ChatData implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public byte[] getOriginalPicture() {
+        return originalPicture;
+    }
+
+    public void setOriginalPicture(byte[] originalPicture) {
+        this.originalPicture = originalPicture;
     }
 
     @Override

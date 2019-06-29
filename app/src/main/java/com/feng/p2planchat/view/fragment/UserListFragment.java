@@ -256,7 +256,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                 if (!event.getData().isOneData()) {
                     break;
                 }
-                //收到新消息后（文本信息）
+                //收到新消息后
                 ChatData chatData = event.getData().getChatData();
                 //更新用户列表的最新消息和时间
                 String ip = chatData.getIp();
@@ -283,15 +283,14 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                             list.add(new ChatData(chatData.getIp(), chatData.getTime()));
                         }
                         //将消息设置为接收类型
-                        chatData.setType(ChatData.RECEIVE_TEXT);
+                        if (chatData.getType() == ChatData.SEND_TEXT) {
+                            chatData.setType(ChatData.RECEIVE_TEXT);
+                        } else if (chatData.getType() == ChatData.SEND_PICTURE) {
+                            chatData.setType(ChatData.RECEIVE_PICTURE);
+                        }
                         list.add(chatData);
 
                         mUserAdapter.notifyDataSetChanged();
-
-                        Log.d(TAG, "onChatDataEventCome: run 2");
-
-                        Log.d(TAG, "onChatDataEventCome: curr.getContent = " + curr.getContent());
-                        Log.d(TAG, "onChatDataEventCome: curr.getTime = " + curr.getTime());
 
                         //将新消息发送给聊天界面
                         Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
@@ -301,7 +300,6 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                         break;
                     }
                 }
-//                mUserAdapter.notifyDataSetChanged();
                 break;
             case EventBusCode.CHAT_2_USER_LIST:
                 Log.d(TAG, "onChatDataEventCome(case EventBusCode.CHAT_2_USER_LIST): run");
@@ -309,7 +307,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                 if (event.getData().isOneData()) {
                     break;
                 }
-                //收到新消息后（文本信息）
+                //收到新消息后
                 List<ChatData> chatDataList = event.getData().getChatDataList();
                 //更新用户列表的最新消息和时间
                 ChatData newChatData = chatDataList.get(chatDataList.size() - 1);

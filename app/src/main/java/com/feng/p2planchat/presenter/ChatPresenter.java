@@ -35,7 +35,26 @@ public class ChatPresenter extends BasePresenter<IChatContract.View>
     }
 
     @Override
+    public void sendPictureSuccess(ChatData chatData) {
+        if (isAttachView()) {
+            getMvpView().sendPictureSuccess(chatData);
+        }
+    }
+
+    @Override
+    public void sendPictureError(String errorMsg) {
+        if (isAttachView()) {
+            getMvpView().sendPictureError(errorMsg);
+        }
+    }
+
+    @Override
     public void sendText(Context context, String otherIp, ChatData chatData) {
         mModel.sendText(context, otherIp, chatData);
+    }
+
+    @Override
+    public void sendPicture(Context context, String otherIp, ChatData chatData) {
+        mModel.sendPicture(context, otherIp, chatData);
     }
 }

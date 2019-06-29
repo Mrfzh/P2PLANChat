@@ -37,4 +37,8 @@ dependencies {
 
     //角标
     implementation 'q.rorbin:badgeview:1.1.3'
+
+    //XPopup
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.lxj:xpopup:1.8.6'
 }

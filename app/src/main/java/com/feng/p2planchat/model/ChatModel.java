@@ -56,14 +56,34 @@ public class ChatModel implements IChatContract.Model {
      */
     @Override
     public void sendText(Context context, String otherIp, ChatData chatData) {
+        if (chatData == null) {
+            mPresenter.sendTextError("发送失败");
+        }
         mChatData = chatData;
 
         if (!NetUtil.hasInternet(context)) {
             mPresenter.sendTextError("当前没有网络");
         }
 
-        mPresenter.sendTextSuccess(chatData);
         //发送文字消息
+        new Thread(new ChatClientThread(otherIp, chatData)).start();
+    }
+
+    /**
+     * 发送图片
+     */
+    @Override
+    public void sendPicture(Context context, String otherIp, ChatData chatData) {
+        if (chatData == null) {
+            mPresenter.sendPictureError("发送失败");
+        }
+        mChatData = chatData;
+
+        if (!NetUtil.hasInternet(context)) {
+            mPresenter.sendTextError("当前没有网络");
+        }
+
+        //发送图片
         new Thread(new ChatClientThread(otherIp, chatData)).start();
     }
 
@@ -86,6 +106,7 @@ public class ChatModel implements IChatContract.Model {
 
                 ChatClient chatClient = new ChatClient(socket, chatData);
                 new Thread(chatClient).start();
+                mHandler.obtainMessage(MESSAGE_SEND_SUCCESS).sendToTarget();
 
             } catch (UnknownHostException e) {
                 Log.d(TAG, "UnknownHostException : " + e.getMessage());

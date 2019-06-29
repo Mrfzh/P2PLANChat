@@ -27,6 +27,7 @@ public class Constant {
 
     public static final String USER_FILE_NAME = "user.txt";     //该文件用于存储自己的用户信息
     public static final String OTHER_USER_IP_FILE_NAME = "otherUserIp.txt";   //该文件存储其他在线用户的IP地址
+    public static final String LOCAL_PICTURE_FOLDER_NAME = "P2P_image_download";   //存储下载图片的本地文件夹名
 
     //更新某种用户信息
     public static final int UPDATE_USER_NAME = 1;
