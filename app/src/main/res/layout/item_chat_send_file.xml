@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:background="@color/color_chat_bg">
+
+    <com.feng.p2planchat.widget.RoundAngleImageView
+        android:id="@+id/iv_item_chat_send_file_head_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:src="@drawable/head_image1"
+        android:scaleType="fitXY"
+        app:radius = "4dp"/>
+
+    <RelativeLayout
+        android:id="@+id/rv_item_chat_send_file_file"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:background="@color/color_white_max"
+        android:layout_toStartOf="@id/iv_item_chat_send_file_head_image"
+        android:layout_marginEnd="10dp">
+
+        <ImageView
+            android:id="@+id/iv_item_chat_send_file_file_icon"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:src="@drawable/file_icon"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="15dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp"/>
+
+        <TextView
+            android:id="@+id/tv_item_chat_send_file_file_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/iv_item_chat_send_file_file_icon"
+            android:layout_alignParentStart="true"
+            android:text="计网课设.doc"
+            android:textColor="@android:color/black"
+            android:textSize="13sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_item_chat_send_file_file_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_item_chat_send_file_file_name"
+            android:text="5.6M"
+            android:textSize="10sp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"/>
+
+        <ProgressBar
+            android:id="@+id/pb_item_chat_send_file_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="50"
+            android:layout_toStartOf="@id/iv_item_chat_send_file_file_icon"
+            android:layout_below="@id/tv_item_chat_send_file_file_name"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

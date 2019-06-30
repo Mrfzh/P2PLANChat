@@ -122,6 +122,7 @@
             android:background="@color/color_chat_more_function_top_line"/>
 
         <RelativeLayout
+            android:id="@+id/rv_chat_album"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -149,6 +150,33 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="30dp"
+            android:layout_toEndOf="@id/rv_chat_album">
+
+            <ImageView
+                android:id="@+id/iv_chat_more_function_file"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/chat_more_function_file"
+                android:scaleType="centerInside"
+                android:background="@drawable/selector_chat_more_function_image_bg"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="文件"
+                android:textSize="10sp"
+                android:layout_below="@id/iv_chat_more_function_file"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="5dp"/>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

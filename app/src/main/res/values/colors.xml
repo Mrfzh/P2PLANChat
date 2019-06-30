@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">@android:color/darker_gray</color>
     <color name="colorPrimaryDark">@android:color/black</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#09C668</color>
 
     <color name="color_main">#09C668</color>
     <color name="color_main_dark">#43A047</color>

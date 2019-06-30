@@ -16,6 +16,9 @@ public class ChatData implements Serializable {
     private String time;        //发送时间
     private byte[] picture;     //图片消息的内容
     private byte[] originalPicture;     //发送图片的原图
+    private String fileName;    //发送文件的文件名
+    private String fileSize;    //发送文件的文件大小
+    private int process;        //文件的发送进度
     private int type;   //发送的消息类型
 
     //消息类型
@@ -23,7 +26,9 @@ public class ChatData implements Serializable {
     public static final int RECEIVE_TEXT = 2;
     public static final int SEND_PICTURE = 3;
     public static final int RECEIVE_PICTURE = 4;
-    public static final int TIME = 5;
+    public static final int SEND_FILE = 5;
+    public static final int RECEIVE_FILE = 6;
+    public static final int TIME = 7;
 
     //发送或接收文字信息
     public ChatData(String ip, String name, byte[] headImage, String content,
@@ -46,6 +51,30 @@ public class ChatData implements Serializable {
         this.time = time;
         this.picture = picture;
         this.originalPicture = originalPicture;
+        this.type = type;
+    }
+
+    //发送或接收文件
+    public ChatData(String ip, String time, String fileName,
+                    String fileSize, int process, int type) {
+        this.ip = ip;
+        this.content = "[文件]";
+        this.time = time;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.process = process;
+        this.type = type;
+    }
+    public ChatData(String ip, String name, byte[] headImage, String time, String fileName,
+                    String fileSize, int process, int type) {
+        this.ip = ip;
+        this.name = name;
+        this.headImage = headImage;
+        this.content = "[文件]";
+        this.time = time;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.process = process;
         this.type = type;
     }
 
@@ -120,9 +149,34 @@ public class ChatData implements Serializable {
         this.originalPicture = originalPicture;
     }
 
-    @Override
-    public String toString() {
-        return "name = " + name + ", content = " + content +
-                ", time = " + time + ", type = " + type;
+    public String getFileName() {
+        return fileName;
     }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(String fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public int getProcess() {
+        return process;
+    }
+
+    public void setProcess(int process) {
+        this.process = process;
+    }
+
+
+    //    @Override
+//    public String toString() {
+//        return "name = " + name + ", content = " + content +
+//                ", time = " + time + ", type = " + type + "process = " + process;
+//    }
 }

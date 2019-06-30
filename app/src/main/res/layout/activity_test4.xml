@@ -55,4 +55,18 @@
         android:layout_marginTop="15dp"
         android:textColor="@color/color_item_user_time"/>
 
+    <Button
+        android:id="@+id/btn_test4_open_service"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="打开服务器，接收传来的文件"/>
+
+    <Button
+        android:id="@+id/btn_test4_choose_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_test4_open_service"
+        android:text="选择文件并发送给其他在线用户"/>
+
 </RelativeLayout>

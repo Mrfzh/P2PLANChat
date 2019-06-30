@@ -20,6 +20,7 @@ import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
 import com.feng.p2planchat.entity.eventbus.Event;
+import com.feng.p2planchat.entity.eventbus.FileEvent;
 import com.feng.p2planchat.entity.eventbus.LogoutEvent;
 import com.feng.p2planchat.entity.eventbus.MainEvent;
 import com.feng.p2planchat.entity.eventbus.UpdateOtherHeadImageEvent;
@@ -30,10 +31,12 @@ import com.feng.p2planchat.entity.serializable.UpdateUser;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.service.HandleChatService;
 import com.feng.p2planchat.service.HandleLoginService;
+import com.feng.p2planchat.service.HandleTransferFileService;
 import com.feng.p2planchat.service.HandleUpdateService;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
 import com.feng.p2planchat.util.OtherUserIpUtil;
+import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
 import com.feng.p2planchat.view.fragment.PersonFragment;
 import com.feng.p2planchat.view.fragment.UserListFragment;
@@ -52,6 +55,7 @@ import java.util.Objects;
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "fzh";
+//    public static boolean IS_FINISH = false;
 
     private TabLayout mBottomTabTv;
     private ViewPager mContentVp;
@@ -64,6 +68,7 @@ public class MainActivity extends BaseActivity {
     private LoginServiceThread mLoginServiceThread;
     private UpdateServiceThread mUpdateServiceThread;
     private ChatServiceThread mChatServiceThread;
+    private TransferFileServiceThread mTransferFileServiceThread;
 
     @Override
     protected void doBeforeSetContentView() {
@@ -159,6 +164,10 @@ public class MainActivity extends BaseActivity {
         mChatServiceThread = new ChatServiceThread();
         mChatServiceThread.start();
 
+        //打开服务器，随时接受其他用户传来的文件
+        mTransferFileServiceThread = new TransferFileServiceThread();
+        mTransferFileServiceThread.start();
+
         showInfo();
     }
 
@@ -171,6 +180,7 @@ public class MainActivity extends BaseActivity {
         mLoginServiceThread.close();
         mUpdateServiceThread.close();
         mChatServiceThread.close();
+        mTransferFileServiceThread.close();
 
         super.onDestroy();
     }
@@ -347,6 +357,78 @@ public class MainActivity extends BaseActivity {
         public void close() {
             try {
                 chatServerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class TransferFileServiceThread extends Thread {
+
+        private ServerSocket transferFileServerSocket;
+
+        @Override
+        public void run() {
+            try {
+                transferFileServerSocket = new ServerSocket(Constant.FILE_PORT);
+                while (true) {
+                    Socket socket = transferFileServerSocket.accept();
+                    //对方的IP地址和用户名
+                    final String otherIp = socket.getInetAddress().getHostAddress();
+                    // 每接收到一个Socket就建立一个新的线程来处理它
+                    HandleTransferFileService service = new HandleTransferFileService(socket);
+//                    final String[] currFileName = new String[1];
+//                    service.setOnHandleTransferFileServiceListener(new HandleTransferFileService
+//                            .OnHandleTransferFileServiceListener() {
+//                        @Override
+//                        public void currentProcess(int process) {
+//                            //更新当前进度
+//                            Event<FileEvent> fileEvent = new Event<>(EventBusCode
+//                                    .MAIN_2_USER_LIST_FILE_DATA,
+//                                    new FileEvent(otherIp, currFileName[0], process));
+//                            EventBusUtil.sendEvent(fileEvent);
+//                        }
+//
+//                        @Override
+//                        public void fileNameAndLength(String fileName, String fileSize) {
+//                            Log.d(TAG, "fileNameAndLength: run");
+//                            //有新文件传来，发送给用户列表界面
+//                            currFileName[0] = fileName;
+//                            ChatData chatData;
+//                            User user = UserUtil.readFromInternalStorage(MainActivity.this);
+//                            if (user != null) {
+//                                chatData = new ChatData(otherIp , TimeUtil.getCurrTime(), fileName,
+//                                        fileSize, 0, ChatData.RECEIVE_FILE);
+//                            } else {
+//                                chatData = null;
+//                            }
+//                            Event<FileEvent> fileEvent = new Event<>(EventBusCode
+//                                    .MAIN_2_USER_LIST_FILE_DATA, new FileEvent(chatData));
+//                            EventBusUtil.sendEvent(fileEvent);
+//                        }
+//                    });
+                    service.setOnHandleTransferFileServiceListener(new HandleTransferFileService
+                            .OnHandleTransferFileServiceListener() {
+                        @Override
+                        public void finish(String fileName, String fileSize) {
+                            //文件接收完毕
+                            ChatData chatData = new ChatData(otherIp, TimeUtil.getCurrTime(), fileName,
+                                    fileSize, 100, ChatData.RECEIVE_FILE);
+                            Event<FileEvent> fileEvent = new Event<>(EventBusCode
+                                    .MAIN_2_USER_LIST_FILE_DATA, new FileEvent(chatData));
+                            EventBusUtil.sendEvent(fileEvent);
+                        }
+                    });
+                    new Thread(service).start();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void close() {
+            try {
+                transferFileServerSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

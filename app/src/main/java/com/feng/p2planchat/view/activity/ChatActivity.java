@@ -1,10 +1,16 @@
 package com.feng.p2planchat.view.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +26,8 @@ import android.widget.TextView;
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.adapter.ChatAdapter;
 import com.feng.p2planchat.base.BaseActivity;
+import com.feng.p2planchat.client.TransferFileClient;
+import com.feng.p2planchat.config.Constant;
 import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IChatContract;
 import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
@@ -29,15 +37,22 @@ import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.presenter.ChatPresenter;
 import com.feng.p2planchat.util.BitmapUtil;
 import com.feng.p2planchat.util.EventBusUtil;
+import com.feng.p2planchat.util.FileUtil;
+import com.feng.p2planchat.util.IpAddressUtil;
 import com.feng.p2planchat.util.PictureUtil;
 import com.feng.p2planchat.util.SoftKeyboardUtil;
 import com.feng.p2planchat.util.TimeUtil;
 import com.feng.p2planchat.util.UserUtil;
+import com.feng.p2planchat.view.test.Test4Activity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +61,10 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
     public static final String TAG = "fzh";
     private static final int REQUEST_CHOOSE_PHOTO_FROM_ALBUM = 1;
+    private static final int REQUEST_CODE_CHOOSE_FILE = 2;
+    private static final int MESSAGE_UPDATE_LIST = 10;
+    private static final int MESSAGE_DELETE_LIST = 11;
+    private static final int MESSAGE_UPDATE_ITEM = 12;
 
     private TextView mTitleTv;
     private RecyclerView mChatRv;
@@ -55,6 +74,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     private ImageView mBackIv;
     private EditText mInputEt;                  //文字输入
     private ImageView mSendPictureOfAlbumIv;    //从相册中选择图片发送
+    private ImageView mSendFileIv;              //发送文件
 
     private String mOtherIp;        //对方的IP地址
     private String mOtherName;      //对方的用户名
@@ -62,6 +82,40 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     private ChatAdapter mChatAdapter;
 
     private static String LAST_TIME = "";   //上一发送消息的时间（双方对话间隔3分钟以上时才显示时间）
+
+    private TransferFileClientThread mTransferFileClientThread;
+
+    private List<Integer> mIndexList;
+    private int refreshIndex;
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case MESSAGE_UPDATE_LIST:
+                    mChatAdapter.notifyDataSetChanged();
+                    //防止软键盘遮挡
+                    mChatRv.scrollToPosition(mChatDataList.size() -1);
+                    break;
+                case MESSAGE_DELETE_LIST:
+                    Collections.sort(mIndexList);
+                    Log.d(TAG, "handleMessage: mIndexList = " + mIndexList);
+                    for (int i = mIndexList.size()-1; i >= 0; i--) {
+                        int deleteIndex = mIndexList.get(i);
+                        Log.d(TAG, "handleMessage: deleteIndex = " + deleteIndex);
+                        mChatDataList.remove((deleteIndex));
+                    }
+//                    mChatAdapter.notifyDataSetChanged();
+                    break;
+                case MESSAGE_UPDATE_ITEM:
+                    mChatAdapter.notifyItemChanged(refreshIndex);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void doBeforeSetContentView() {
@@ -151,11 +205,24 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
         mSendPictureOfAlbumIv = findViewById(R.id.iv_chat_more_function_album);
         mSendPictureOfAlbumIv.setOnClickListener(this);
+
+        mSendFileIv = findViewById(R.id.iv_chat_more_function_file);
+        mSendFileIv.setOnClickListener(this);
     }
 
     @Override
     protected void doInOnCreate() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        //销毁活动时结束线程
+        if (mTransferFileClientThread != null) {
+            mTransferFileClientThread.close();
+        }
+
+        super.onDestroy();
     }
 
     @Override
@@ -209,6 +276,13 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
             case R.id.iv_chat_more_function_album:
                 //从相册中选择图片发送
                 chooseFromAlbum();
+                break;
+            case R.id.iv_chat_more_function_file:
+                //选择文件发送
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
                 break;
             default:
                 break;
@@ -290,19 +364,28 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onStickyChatEventCome(Event<ChatDataEvent> event) {
+        Log.d(TAG, "onStickyChatEventCome: run");
         switch (event.getCode()) {
             case EventBusCode.USER_LIST_2_CHAT:
+                Log.d(TAG, "onStickyChatEventCome(USER_LIST_2_CHAT): run");
                 mOtherName = event.getData().getName();
                 mOtherIp = event.getData().getIp();
+//                mChatDataList = new ArrayList<>(event.getData().getChatDataList());
                 mChatDataList = event.getData().getChatDataList();
-                //获取上一次聊天时间
-                LAST_TIME = mChatDataList.get(mChatDataList.size() - 1).getTime();
-                //如果这时是在聊天界面，更新消息
-                if (mChatAdapter != null) {
-                    mChatAdapter.notifyDataSetChanged();
-                    //消息滑动到最后
-                    mChatRv.scrollToPosition(mChatDataList.size() -1);
+                if (!mChatDataList.isEmpty()) {
+                    //获取上一次聊天时间
+                    LAST_TIME = mChatDataList.get(mChatDataList.size() - 1).getTime();
+                    //如果这时是在聊天界面，更新消息
+                    if (mChatAdapter != null) {
+                        Log.d(TAG, "onStickyChatEventCome: 更新列表");
+                        mChatAdapter.notifyDataSetChanged();
+                        //消息滑动到最后
+                        mChatRv.scrollToPosition(mChatDataList.size() -1);
+                    }
+                } else {
+                    Log.d(TAG, "onStickyChatEventCome: mChatDataList.isEmpty()");
                 }
+
                 break;
             default:
                 break;
@@ -373,6 +456,24 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                     sendPicture(imagePath);
                 }
                 break;
+            case REQUEST_CODE_CHOOSE_FILE:
+                if (resultCode == RESULT_OK) {  //是否选择，没选择就不会继续
+                    Uri uri = data.getData();   //得到uri，后面就是将uri转化成file的过程。
+                    String[] proj = {MediaStore.Images.Media.DATA};
+                    Cursor actualimagecursor = managedQuery(uri, proj, null, null, null);
+                    int actual_image_column_index = actualimagecursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    actualimagecursor.moveToFirst();
+                    String filePath = actualimagecursor.getString(actual_image_column_index);
+                    if (filePath == null) {
+                        showShortToast("不支持该类型");
+                    } else {
+                        Log.d(TAG, "onActivityResult: filePath = " + filePath);
+                        //获得路径后就是传输File了
+                        mTransferFileClientThread = new TransferFileClientThread(filePath);
+                        mTransferFileClientThread.start();
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -391,5 +492,93 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                                 BitmapFactory.decodeFile(imagePath)));
             }
         }, 100);
+    }
+
+
+    /**
+     * 作为客户端发送文件
+     */
+    class TransferFileClientThread extends Thread {
+
+        String filePath;
+        ChatData chatData;
+        TransferFileClient client;
+        List<Integer> indexList = new ArrayList<>();    //跟当前文件有关的索引
+
+        public TransferFileClientThread(String filePath) {
+            this.filePath = filePath;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Socket socket = new Socket(mOtherIp, Constant.FILE_PORT);
+                client = new TransferFileClient(socket, filePath);
+
+                client.setOnTransferFileClientListener(new TransferFileClient
+                        .OnTransferFileClientListener() {
+                    @Override
+                    public void currentProcess(int process) {
+                        //设置当前进度
+                        if (chatData != null) {
+                            Log.d(TAG, "currentProcess: process =" + process);
+                            chatData.setProcess(process);
+                            mHandler.obtainMessage(MESSAGE_UPDATE_ITEM).sendToTarget();
+                        }
+                    }
+
+                    @Override
+                    public void fileNameAndLength(String fileName, String fileSize) {
+                        //得到文件名和文件长度
+                        //先判断是否需要显示时间
+                        Log.d(TAG, "fileNameAndLength: run");
+                        String currTime = TimeUtil.getCurrTime();
+                        if (LAST_TIME.equals("") || TimeUtil.getTimeInterval(LAST_TIME, currTime) >= 3) {
+                            indexList.add(mChatDataList.size());
+                            mChatDataList.add(new ChatData(UserUtil.readFromInternalStorage(
+                                    ChatActivity.this).getIpAddress(), currTime));
+                        }
+                        LAST_TIME = currTime;
+                        //发送文件
+                        User user = UserUtil.readFromInternalStorage(ChatActivity.this);
+                        if (user != null) {
+                            chatData = new ChatData(user.getIpAddress(), user.getUserName(),
+                                    user.getHeadImage(), currTime, fileName, fileSize,
+                                    0, ChatData.SEND_FILE);
+                        }
+                        refreshIndex = mChatDataList.size();
+                        indexList.add(mChatDataList.size());
+                        mChatDataList.add(chatData);
+                        mHandler.obtainMessage(MESSAGE_UPDATE_LIST).sendToTarget();
+                    }
+
+                    @Override
+                    public void transferSuccess() {
+                        indexList.clear();
+                        mHandler.obtainMessage(MESSAGE_UPDATE_LIST).sendToTarget();
+                        //发送消息给用户列表界面
+                        Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
+                                new ChatDataEvent(mOtherName, mOtherIp, mChatDataList));
+                        EventBusUtil.sendEvent(chatDataEvent);
+                    }
+                });
+                new Thread(client).start();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void close() {
+            if (client != null) {
+                client.close();
+            }
+            //删除未传输完的item
+            if (!indexList.isEmpty()) {
+                mIndexList = new ArrayList<>(indexList);
+                mHandler.obtainMessage(MESSAGE_DELETE_LIST).sendToTarget();
+            }
+        }
     }
 }

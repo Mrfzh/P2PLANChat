@@ -16,6 +16,7 @@ public class Constant {
     public static final int USER_PORT = 20000;  //获取用户信息的端口号
     public static final int UPDATE_PORT = 21000;    //更新用户信息的端口号
     public static final int CHAT_PORT = 23500;      //聊天的端口号
+    public static final int FILE_PORT = 26300;      //文件传输的端口号
 
     //主页面底部tab的title
     public static final String [] MAIN_TAB_TITLES = {"用户列表", "我"};
@@ -27,7 +28,8 @@ public class Constant {
 
     public static final String USER_FILE_NAME = "user.txt";     //该文件用于存储自己的用户信息
     public static final String OTHER_USER_IP_FILE_NAME = "otherUserIp.txt";   //该文件存储其他在线用户的IP地址
-    public static final String LOCAL_PICTURE_FOLDER_NAME = "P2P_image_download";   //存储下载图片的本地文件夹名
+    public static final String LOCAL_PICTURE_FOLDER_NAME = "P2P_file_download";   //存储下载图片的本地文件夹名
+    public static final String LOCAL_FILE_FOLDER_NAME = "P2P_file_download";   //存储下载文件的本地文件夹名
 
     //更新某种用户信息
     public static final int UPDATE_USER_NAME = 1;

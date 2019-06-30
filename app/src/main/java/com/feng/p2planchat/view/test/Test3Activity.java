@@ -1,6 +1,5 @@
 package com.feng.p2planchat.view.test;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,27 +7,6 @@ import android.widget.EditText;
 import com.feng.p2planchat.R;
 import com.feng.p2planchat.base.BaseActivity;
 import com.feng.p2planchat.base.BasePresenter;
-import com.feng.p2planchat.client.ChatClient;
-import com.feng.p2planchat.client.LoginClient;
-import com.feng.p2planchat.config.Constant;
-import com.feng.p2planchat.config.EventBusCode;
-import com.feng.p2planchat.entity.eventbus.Event;
-import com.feng.p2planchat.entity.eventbus.UserListEvent;
-import com.feng.p2planchat.entity.serializable.User;
-import com.feng.p2planchat.service.HandleChatService;
-import com.feng.p2planchat.service.HandleLoginService;
-import com.feng.p2planchat.util.EventBusUtil;
-import com.feng.p2planchat.util.IpAddressUtil;
-import com.feng.p2planchat.util.OtherUserIpUtil;
-import com.feng.p2planchat.util.UserUtil;
-import com.feng.p2planchat.view.activity.MainActivity;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Test3Activity extends BaseActivity implements View.OnClickListener{
 
@@ -78,7 +56,7 @@ public class Test3Activity extends BaseActivity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.btn_test3_send:
+            case R.id.btn_test3_send:
 ////                List<String> otherIpList = OtherUserIpUtil.
 ////                        readFromInternalStorage(this).getOtherUserIpList();
 //                List<String> otherIpList = new ArrayList<>();
@@ -90,6 +68,8 @@ public class Test3Activity extends BaseActivity implements View.OnClickListener{
 //                }
 //
 //                break;
+
+                break;
             default:
                 break;
         }

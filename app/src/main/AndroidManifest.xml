@@ -19,7 +19,9 @@
         <activity android:name=".view.test.Test4Activity">
 
         </activity>
-        <activity android:name=".view.test.Test3Activity"></activity>
+        <activity android:name=".view.test.Test3Activity">
+
+        </activity>
         <activity android:name=".view.activity.ChatActivity">
 
         </activity>

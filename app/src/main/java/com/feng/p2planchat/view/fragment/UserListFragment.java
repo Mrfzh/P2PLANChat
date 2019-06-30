@@ -17,6 +17,7 @@ import com.feng.p2planchat.config.EventBusCode;
 import com.feng.p2planchat.contract.IUserListContract;
 import com.feng.p2planchat.entity.eventbus.ChatDataEvent;
 import com.feng.p2planchat.entity.eventbus.DeleteUserEvent;
+import com.feng.p2planchat.entity.eventbus.FileEvent;
 import com.feng.p2planchat.entity.serializable.ChatData;
 import com.feng.p2planchat.entity.serializable.User;
 import com.feng.p2planchat.entity.serializable.OtherUserIp;
@@ -166,7 +167,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUserListEventCome(Event<UserListEvent> event) {
-        Log.d(TAG, "onUserListEventCome: run");
+//        Log.d(TAG, "onUserListEventCome: run");
         switch (event.getCode()) {
             case EventBusCode.MAIN_2_USER_LIST:
                 Log.d(TAG, "onUserListEventCome(EventBusCode.MAIN_2_USER_LIST): run");
@@ -248,7 +249,7 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatDataEventCome(Event<ChatDataEvent> event) {
-        Log.d(TAG, "onChatDataEventCome: run");
+//        Log.d(TAG, "onChatDataEventCome: run");
         switch (event.getCode()) {
             case EventBusCode.MAIN_2_USER_LIST_CHAT_DATA:
                 Log.d(TAG, "onChatDataEventCome(case EventBusCode.MAIN_2_USER_LIST): run");
@@ -318,11 +319,96 @@ public class UserListFragment extends BaseFragment<UserListPresenter>
                     if (curr.getIp().equals(event.getData().getIp())) {
                         curr.setTime(newChatData.getTime());
                         curr.setContent(newChatData.getContent());
+//                        curr.setChatDataList(new ArrayList<>(chatDataList));
                         curr.setChatDataList(chatDataList);
                         break;
                     }
                 }
                 mUserAdapter.notifyDataSetChanged();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFileEventCome(Event<FileEvent> event) {
+        switch (event.getCode()) {
+            case EventBusCode.MAIN_2_USER_LIST_FILE_DATA:
+                Log.d(TAG, "onFileEventCome: run");
+                if (!event.getData().isUpdateProcess()) {
+                    //收到新的文件
+                    ChatData chatData = event.getData().getChatData();
+                    if (chatData != null) {
+                        //更新用户列表的最新消息和时间
+                        String ip = chatData.getIp();
+                        Log.d(TAG, "onFileEventCome: ip = " + ip);
+                        for (int i = 0; i < mUserDataList.size(); i++) {
+                            UserData curr = mUserDataList.get(i);
+                            Log.d(TAG, "onFileEventCome: curr.getIp = " + curr.getIp());
+                            if (curr.getIp().equals(ip)) {
+                                Log.d(TAG, "onFileEventCome: run 2");
+                                curr.setTime(chatData.getTime());
+                                curr.setContent(chatData.getContent());
+                                //在这里设置发送信息方的头像和用户名
+                                chatData.setHeadImage(BitmapUtil.bitmap2ByteArray(curr.getHeadImage()));
+                                chatData.setName(curr.getName());
+
+                                //只要当前界面不是聊天界面，都更新消息提醒数
+                                if (ActivityUtil.isActivityTop(ChatActivity.class, getContext())) {
+                                    curr.setUnreadMessageNum(0);
+                                } else {
+                                    curr.setUnreadMessageNum(curr.getUnreadMessageNum() + 1);
+                                }
+
+                                //更新聊天消息
+                                List<ChatData> list = curr.getChatDataList();
+                                //判断是否要显示时间
+                                if (list.size() == 0 || TimeUtil.getTimeInterval(list.get(list.size()-1).getTime()
+                                        , chatData.getTime()) >= 3) {
+                                    list.add(new ChatData(chatData.getIp(), chatData.getTime()));
+                                }
+                                list.add(chatData);
+
+                                mUserAdapter.notifyDataSetChanged();
+
+                                //将新消息发送给聊天界面（为什么这里发送不过去？）
+                                Log.d(TAG, "onFileEventCome: chatData.getName() = " + chatData.getName());
+                                Log.d(TAG, "onFileEventCome: chatData.getIp() = " + chatData.getIp());
+                                Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.USER_LIST_2_CHAT,
+                                        new ChatDataEvent(chatData.getName(), chatData.getIp(), list));
+                                EventBusUtil.sendStickyEvent(chatDataEvent);
+                                Log.d(TAG, "onFileEventCome: run 3");
+                            }
+                        }
+                    }
+                }
+//                else {
+//                    Log.d(TAG, "onFileEventCome: run 4");
+//                    //更新文件接收进度
+//                    for (int i = 0; i < mUserDataList.size(); i++) {
+//                        UserData curr = mUserDataList.get(i);
+//                        Log.d(TAG, "onFileEventCome: ip2 = " + event.getData().getIp());
+//                        if (curr.getIp().equals(event.getData().getIp())) {
+//                            //更新聊天消息
+//                            List<ChatData> list = curr.getChatDataList();
+//                            for (int j = 0; j < list.size(); j++) {
+//                                //list.get(j).getFileName()为null,why???
+//                                if (list.get(j).getFileName() != null &&
+//                                        list.get(j).getFileName().equals(event.getData().getFileName())) {
+//                                    //更新进度
+//                                    Log.d(TAG, "onFileEventCome: currProcess = " + event.getData().getProcess());
+//                                    list.get(j).setProcess(event.getData().getProcess());
+//                                }
+//                            }
+//
+//                            //将新消息发送给聊天界面
+//                            Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode
+//                                    .USER_LIST_2_CHAT, new ChatDataEvent(curr.getName(), curr.getIp(), list));
+//                            EventBusUtil.sendStickyEvent(chatDataEvent);
+//                        }
+//                    }
+//                }
                 break;
             default:
                 break;

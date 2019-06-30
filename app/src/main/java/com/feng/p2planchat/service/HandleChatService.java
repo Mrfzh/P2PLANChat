@@ -1,7 +1,15 @@
 package com.feng.p2planchat.service;
 
-import com.feng.p2planchat.entity.serializable.ChatData;
+import android.os.Environment;
+import android.util.Log;
 
+import com.feng.p2planchat.config.Constant;
+import com.feng.p2planchat.entity.serializable.ChatData;
+import com.feng.p2planchat.util.FileUtil;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -12,6 +20,8 @@ import java.net.Socket;
  * Created on 2019/6/21
  */
 public class HandleChatService implements Runnable{
+
+    public static final String TAG = "fzh";
 
     private Socket mSocket;
 
@@ -56,3 +66,4 @@ public class HandleChatService implements Runnable{
         }
     }
 }
+

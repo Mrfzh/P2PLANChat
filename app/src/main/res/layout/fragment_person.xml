@@ -73,10 +73,47 @@
         android:background="@color/color_person_line"/>
 
     <RelativeLayout
-        android:id="@+id/rv_person_logout_layout"
+        android:id="@+id/rv_person_storage_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/v_person_line_two"
+        android:background="@drawable/selector_person_item"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="存储位置"
+            android:textSize="16sp"
+            android:textColor="@color/color_person_item_text"
+            android:layout_centerInParent="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="30dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/storage/emulated/0/P2P_file_download"
+            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp"
+            android:textSize="11sp"/>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/v_person_line_three"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/rv_person_storage_layout"
+        android:background="@color/color_person_line"/>
+
+    <RelativeLayout
+        android:id="@+id/rv_person_logout_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/v_person_line_three"
         android:background="@drawable/selector_person_item"
         android:clickable="true"
         android:focusable="true">
@@ -102,7 +139,7 @@
     </RelativeLayout>
 
     <View
-        android:id="@+id/v_person_line_three"
+        android:id="@+id/v_person_line_four"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_below="@id/rv_person_logout_layout"

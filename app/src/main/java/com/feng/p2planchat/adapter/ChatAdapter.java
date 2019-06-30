@@ -4,10 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,8 @@ import java.util.List;
  * Created on 2019/6/16
  */
 public class ChatAdapter extends RecyclerView.Adapter {
+
+    public static final String TAG = "fzh";
 
     private Context mContext;
     private List<ChatData> mChatDataList;
@@ -61,6 +65,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
         } else if (i == ChatData.RECEIVE_PICTURE) {
             return new ReceivePictureViewHolder(LayoutInflater.from(mContext).inflate(
                     R.layout.item_chat_receive_picture, null));
+        } else if (i == ChatData.SEND_FILE) {
+            return new SendFileViewHolder(LayoutInflater.from(mContext).inflate(
+                    R.layout.item_chat_send_file, null));
+        } else if (i == ChatData.RECEIVE_FILE) {
+            return new ReceiveFileViewHolder(LayoutInflater.from(mContext).inflate(
+                    R.layout.item_chat_receive_file, null));
         }
         return null;
     }
@@ -123,6 +133,36 @@ public class ChatAdapter extends RecyclerView.Adapter {
                     return false;
                 }
             });
+        } else if (viewHolder instanceof SendFileViewHolder) {
+            SendFileViewHolder sendFileViewHolder = (SendFileViewHolder) viewHolder;
+            sendFileViewHolder.headImage.setImageBitmap(BitmapUtil
+                    .byteArray2Bitmap(mChatDataList.get(i).getHeadImage()));
+            sendFileViewHolder.fileName.setText(mChatDataList.get(i).getFileName());
+            sendFileViewHolder.fileSize.setText(mChatDataList.get(i).getFileSize());
+            int currProcess = mChatDataList.get(i).getProcess();
+            Log.d(TAG, "onBindViewHolder: mChatDataList.get(" + i + ") = " + mChatDataList.get(i));
+            Log.d(TAG, "onBindViewHolder: currProgress = " + currProcess);
+            if (currProcess != 100) {
+                sendFileViewHolder.process.setProgress(currProcess);
+                Log.d(TAG, "onBindViewHolder: run 1");
+            } else{
+                Log.d(TAG, "onBindViewHolder: run 2");
+                sendFileViewHolder.process.setVisibility(View.GONE);
+                sendFileViewHolder.fileSize.setVisibility(View.VISIBLE);
+            }
+        } else if (viewHolder instanceof ReceiveFileViewHolder) {
+            ReceiveFileViewHolder receiveFileViewHolder = (ReceiveFileViewHolder) viewHolder;
+            receiveFileViewHolder.headImage.setImageBitmap(BitmapUtil
+                    .byteArray2Bitmap(mChatDataList.get(i).getHeadImage()));
+            receiveFileViewHolder.fileName.setText(mChatDataList.get(i).getFileName());
+            receiveFileViewHolder.fileSize.setText(mChatDataList.get(i).getFileSize());
+//            int currProcess = mChatDataList.get(i).getProcess();
+//            if (currProcess != 100) {
+//                receiveFileViewHolder.process.setProgress(currProcess);
+//            } else {
+//                receiveFileViewHolder.process.setVisibility(View.GONE);
+//                receiveFileViewHolder.fileSize.setVisibility(View.VISIBLE);
+//            }
         }
     }
 
@@ -192,6 +232,38 @@ public class ChatAdapter extends RecyclerView.Adapter {
             super(itemView);
             headImage = itemView.findViewById(R.id.iv_item_chat_receive_picture_head_image);
             picture = itemView.findViewById(R.id.iv_item_chat_receive_picture_picture);
+        }
+    }
+
+    class SendFileViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView headImage;
+        TextView fileName;
+        TextView fileSize;
+        ProgressBar process;
+
+        public SendFileViewHolder(@NonNull View itemView) {
+            super(itemView);
+            headImage = itemView.findViewById(R.id.iv_item_chat_send_file_head_image);
+            fileName = itemView.findViewById(R.id.tv_item_chat_send_file_file_name);
+            fileSize = itemView.findViewById(R.id.tv_item_chat_send_file_file_size);
+            process = itemView.findViewById(R.id.pb_item_chat_send_file_progress);
+        }
+    }
+
+    class ReceiveFileViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView headImage;
+        TextView fileName;
+        TextView fileSize;
+//        ProgressBar process;
+
+        public ReceiveFileViewHolder(@NonNull View itemView) {
+            super(itemView);
+            headImage = itemView.findViewById(R.id.iv_item_chat_receive_file_head_image);
+            fileName = itemView.findViewById(R.id.tv_item_chat_receive_file_file_name);
+            fileSize = itemView.findViewById(R.id.tv_item_chat_receive_file_file_size);
+//            process = itemView.findViewById(R.id.pb_item_chat_receive_file_progress);
         }
     }
 }
