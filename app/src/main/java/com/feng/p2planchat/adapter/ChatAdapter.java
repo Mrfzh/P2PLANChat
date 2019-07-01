@@ -77,6 +77,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, final int i) {
+//        Log.d(TAG, "onBindViewHolder: run, i == " + i);
         if (viewHolder instanceof SendTextViewHolder) {
             SendTextViewHolder sendTextViewHolder = (SendTextViewHolder) viewHolder;
             sendTextViewHolder.headImage.setImageBitmap(BitmapUtil
@@ -135,21 +136,26 @@ public class ChatAdapter extends RecyclerView.Adapter {
             });
         } else if (viewHolder instanceof SendFileViewHolder) {
             SendFileViewHolder sendFileViewHolder = (SendFileViewHolder) viewHolder;
+//            sendFileViewHolder.setIsRecyclable(false);  //禁止复用
             sendFileViewHolder.headImage.setImageBitmap(BitmapUtil
                     .byteArray2Bitmap(mChatDataList.get(i).getHeadImage()));
             sendFileViewHolder.fileName.setText(mChatDataList.get(i).getFileName());
             sendFileViewHolder.fileSize.setText(mChatDataList.get(i).getFileSize());
+
             int currProcess = mChatDataList.get(i).getProcess();
-            Log.d(TAG, "onBindViewHolder: mChatDataList.get(" + i + ") = " + mChatDataList.get(i));
-            Log.d(TAG, "onBindViewHolder: currProgress = " + currProcess);
-            if (currProcess != 100) {
-                sendFileViewHolder.process.setProgress(currProcess);
-                Log.d(TAG, "onBindViewHolder: run 1");
-            } else{
-                Log.d(TAG, "onBindViewHolder: run 2");
-                sendFileViewHolder.process.setVisibility(View.GONE);
-                sendFileViewHolder.fileSize.setVisibility(View.VISIBLE);
-            }
+//            if (currProcess != 100) {
+//                sendFileViewHolder.process.setProgress(currProcess);
+//            } else {
+//                sendFileViewHolder.process.setVisibility(View.GONE);
+//                sendFileViewHolder.fileSize.setVisibility(View.VISIBLE);
+//            }
+
+            sendFileViewHolder.process.setProgress(currProcess);
+            sendFileViewHolder.processTv.setText(currProcess + "%");
+//            Log.d(TAG, "onBindViewHolder: sendFileViewHolder.process = " + sendFileViewHolder.process.getProgress());
+//            if (currProcess == 100) {
+//                Log.d(TAG, "onBindViewHolder: mChatDataList.get(i).getProcess() = " + mChatDataList.get(i).getProcess());
+//            }
         } else if (viewHolder instanceof ReceiveFileViewHolder) {
             ReceiveFileViewHolder receiveFileViewHolder = (ReceiveFileViewHolder) viewHolder;
             receiveFileViewHolder.headImage.setImageBitmap(BitmapUtil
@@ -241,6 +247,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         TextView fileName;
         TextView fileSize;
         ProgressBar process;
+        TextView processTv;
 
         public SendFileViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -248,6 +255,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             fileName = itemView.findViewById(R.id.tv_item_chat_send_file_file_name);
             fileSize = itemView.findViewById(R.id.tv_item_chat_send_file_file_size);
             process = itemView.findViewById(R.id.pb_item_chat_send_file_progress);
+            processTv = itemView.findViewById(R.id.tv_item_chat_send_file_process);
         }
     }
 

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -53,6 +54,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,11 +62,11 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         implements View.OnClickListener, IChatContract.View {
 
     public static final String TAG = "fzh";
+    private static final String KEY_UPDATE_INDEX = "key_update_index";
     private static final int REQUEST_CHOOSE_PHOTO_FROM_ALBUM = 1;
     private static final int REQUEST_CODE_CHOOSE_FILE = 2;
     private static final int MESSAGE_UPDATE_LIST = 10;
-    private static final int MESSAGE_DELETE_LIST = 11;
-    private static final int MESSAGE_UPDATE_ITEM = 12;
+    private static final int MESSAGE_UPDATE_ITEM = 11;
 
     private TextView mTitleTv;
     private RecyclerView mChatRv;
@@ -83,10 +85,10 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 
     private static String LAST_TIME = "";   //上一发送消息的时间（双方对话间隔3分钟以上时才显示时间）
 
-    private TransferFileClientThread mTransferFileClientThread;
+    private List<TransferFileClientThread> mTransferFileClientThreadList = new ArrayList<>();
 
-    private List<Integer> mIndexList;
-    private int refreshIndex;
+    private List<Integer> mIndexList = new ArrayList<>();
+//    private int refreshIndex;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
@@ -98,18 +100,11 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                     //防止软键盘遮挡
                     mChatRv.scrollToPosition(mChatDataList.size() -1);
                     break;
-                case MESSAGE_DELETE_LIST:
-                    Collections.sort(mIndexList);
-                    Log.d(TAG, "handleMessage: mIndexList = " + mIndexList);
-                    for (int i = mIndexList.size()-1; i >= 0; i--) {
-                        int deleteIndex = mIndexList.get(i);
-                        Log.d(TAG, "handleMessage: deleteIndex = " + deleteIndex);
-                        mChatDataList.remove((deleteIndex));
-                    }
-//                    mChatAdapter.notifyDataSetChanged();
-                    break;
                 case MESSAGE_UPDATE_ITEM:
-                    mChatAdapter.notifyItemChanged(refreshIndex);
+//                    mChatAdapter.notifyItemChanged(refreshIndex);
+//                    Log.d(TAG, "handleMessage: msg.getData().getInt(KEY_UPDATE_INDEX) = "
+//                            + msg.getData().getInt(KEY_UPDATE_INDEX));
+                    mChatAdapter.notifyItemChanged(msg.getData().getInt(KEY_UPDATE_INDEX));
                     break;
                 default:
                     break;
@@ -218,8 +213,16 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     @Override
     protected void onDestroy() {
         //销毁活动时结束线程
-        if (mTransferFileClientThread != null) {
-            mTransferFileClientThread.close();
+        for (int i = 0; i < mTransferFileClientThreadList.size(); i++) {
+            mTransferFileClientThreadList.get(i).close();
+        }
+        //删除为传输完的文件信息
+        Collections.sort(mIndexList);
+        Log.d(TAG, "handleMessage: mIndexList = " + mIndexList);
+        for (int i = mIndexList.size()-1; i >= 0; i--) {
+            int deleteIndex = mIndexList.get(i);
+            Log.d(TAG, "handleMessage: deleteIndex = " + deleteIndex);
+            mChatDataList.remove((deleteIndex));
         }
 
         super.onDestroy();
@@ -469,8 +472,9 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                     } else {
                         Log.d(TAG, "onActivityResult: filePath = " + filePath);
                         //获得路径后就是传输File了
-                        mTransferFileClientThread = new TransferFileClientThread(filePath);
-                        mTransferFileClientThread.start();
+                        TransferFileClientThread transferFileClientThread = new TransferFileClientThread(filePath);
+                        mTransferFileClientThreadList.add(transferFileClientThread);
+                        transferFileClientThread.start();
                     }
                 }
                 break;
@@ -504,6 +508,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         ChatData chatData;
         TransferFileClient client;
         List<Integer> indexList = new ArrayList<>();    //跟当前文件有关的索引
+        int chatDataIndex;
 
         public TransferFileClientThread(String filePath) {
             this.filePath = filePath;
@@ -512,6 +517,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         @Override
         public void run() {
             try {
+
                 Socket socket = new Socket(mOtherIp, Constant.FILE_PORT);
                 client = new TransferFileClient(socket, filePath);
 
@@ -523,7 +529,13 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                         if (chatData != null) {
                             Log.d(TAG, "currentProcess: process =" + process);
                             chatData.setProcess(process);
-                            mHandler.obtainMessage(MESSAGE_UPDATE_ITEM).sendToTarget();
+//                            mHandler.obtainMessage(MESSAGE_UPDATE_ITEM).sendToTarget();
+                            Message message = new Message();
+                            message.what = MESSAGE_UPDATE_ITEM;
+                            Bundle bundle = new Bundle();
+                            bundle.putInt(KEY_UPDATE_INDEX, chatDataIndex);
+                            message.setData(bundle);
+                            mHandler.sendMessage(message);
                         }
                     }
 
@@ -546,16 +558,20 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                                     user.getHeadImage(), currTime, fileName, fileSize,
                                     0, ChatData.SEND_FILE);
                         }
-                        refreshIndex = mChatDataList.size();
-                        indexList.add(mChatDataList.size());
+                        chatDataIndex = mChatDataList.size();
+                        indexList.add(chatDataIndex);
+                        mIndexList.addAll(indexList);   //添加进可能被删除的item列表
                         mChatDataList.add(chatData);
                         mHandler.obtainMessage(MESSAGE_UPDATE_LIST).sendToTarget();
+
                     }
 
                     @Override
                     public void transferSuccess() {
+                        mIndexList.removeAll(indexList);    //从可能被删除的item列表移除
                         indexList.clear();
                         mHandler.obtainMessage(MESSAGE_UPDATE_LIST).sendToTarget();
+
                         //发送消息给用户列表界面
                         Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
                                 new ChatDataEvent(mOtherName, mOtherIp, mChatDataList));
@@ -573,11 +589,6 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
         public void close() {
             if (client != null) {
                 client.close();
-            }
-            //删除未传输完的item
-            if (!indexList.isEmpty()) {
-                mIndexList = new ArrayList<>(indexList);
-                mHandler.obtainMessage(MESSAGE_DELETE_LIST).sendToTarget();
             }
         }
     }
