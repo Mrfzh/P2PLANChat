@@ -107,23 +107,45 @@ public class ModifyNameModel implements IModifyNameContract.Model {
 
         @Override
         public void run() {
-            try {
-                //给每个在线用户发出请求
-                for (int i = 0; i < mOtherUserIpList.size(); i++) {
+//            try {
+//                //给每个在线用户发出请求
+//                for (int i = 0; i < mOtherUserIpList.size(); i++) {
+//
+//                    Log.d(TAG, "UpdateClientThread: " + mOtherUserIpList.get(i));
+//
+//                    //注意：如果对方没有打开相应端口，会抛出IOException
+//                    Socket socket = new Socket(mOtherUserIpList.get(i), Constant.UPDATE_PORT);
+//                    UpdateClient updateClient = new UpdateClient(socket, mUpdateInfo);
+//                    new Thread(updateClient).start();
+//                }
+//
+//            } catch (UnknownHostException e) {
+//                Log.d(TAG, "UnknownHostException : " + e.getMessage());
+//            } catch (IOException e) {
+//                Log.d(TAG, "IOException : " + e.getMessage());
+//            }
 
-                    Log.d(TAG, "UpdateClientThread: " + mOtherUserIpList.get(i));
 
+            //给每个在线用户发出请求
+            for (int i = 0; i < mOtherUserIpList.size(); i++) {
+
+                Log.d(TAG, "UpdateClientThread: " + mOtherUserIpList.get(i));
+
+                Socket socket = null;
+                try {
                     //注意：如果对方没有打开相应端口，会抛出IOException
-                    Socket socket = new Socket(mOtherUserIpList.get(i), Constant.UPDATE_PORT);
-                    UpdateClient updateClient = new UpdateClient(socket, mUpdateInfo);
-                    new Thread(updateClient).start();
+                    socket = new Socket(mOtherUserIpList.get(i), Constant.UPDATE_PORT);
+                } catch (UnknownHostException e) {
+                    Log.d(TAG, "UnknownHostException : " + e.getMessage());
+                    continue;
+                } catch (IOException e) {
+                    Log.d(TAG, "IOException : " + e.getMessage());
+                    continue;
                 }
-
-            } catch (UnknownHostException e) {
-                Log.d(TAG, "UnknownHostException : " + e.getMessage());
-            } catch (IOException e) {
-                Log.d(TAG, "IOException : " + e.getMessage());
+                UpdateClient updateClient = new UpdateClient(socket, mUpdateInfo);
+                new Thread(updateClient).start();
             }
+
         }
     }
 

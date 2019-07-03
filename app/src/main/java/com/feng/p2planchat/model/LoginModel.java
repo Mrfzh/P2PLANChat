@@ -80,16 +80,65 @@ public class LoginModel implements ILoginContract.Model {
 
         @Override
         public void run() {
-            try {
-                //得到其他在线用户的ip地址
-                List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+//            try {
+//                //得到其他在线用户的ip地址
+//                List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+//
+//                //给每个在线用户发出请求
+//                for (int i = 0; i < ipAddressList.size(); i++) {
+//                    Log.d(TAG, "LoginClientThread:run run");
+//
+//                    //注意：如果对方没有打开相应端口，会抛出IOException
+//                    Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+//                    mUserNum++;
+//                    LoginClient loginClient = new LoginClient(socket, mOwnInfo);
+//                    loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
+//                        @Override
+//                        public void getUserInfo(User user) {
+//                            //这里没有回调？？？
+//
+//                            Log.d(TAG, "getUserInfo: run");
+//                            Log.d(TAG, "getUserInfo: user = " + user.show());
+//                            mUserList.add(user);
+//                            mAtomicInteger.incrementAndGet();
+//                        }
+//                    });
+//                    new Thread(loginClient).start();
+//                }
+//                while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
+//                    //循环，等待线程结束
+//                }
+//                isFinish = true;
+//            } catch (UnknownHostException e) {
+//                isFinish = true;
+//                e.printStackTrace();
+//                Log.d(TAG, "UnknownHostException : " + e.getMessage());
+//            } catch (IOException e) {
+//                isFinish = true;
+//                e.printStackTrace();
+//                Log.d(TAG, "IOException : " + e.getMessage());
+//            }
 
-                //给每个在线用户发出请求
-                for (int i = 0; i < ipAddressList.size(); i++) {
-                    Log.d(TAG, "LoginClientThread:run run");
 
+            //得到其他在线用户的ip地址
+            List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+
+            //给每个在线用户发出请求
+            for (int i = 0; i < ipAddressList.size(); i++) {
+                Log.d(TAG, "LoginClientThread:run run");
+
+                Socket socket = null;
+                try {
                     //注意：如果对方没有打开相应端口，会抛出IOException
-                    Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+                    socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+                }catch (UnknownHostException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "UnknownHostException : " + e.getMessage());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "IOException : " + e.getMessage());
+                }
+                if (socket != null) {
                     mUserNum++;
                     LoginClient loginClient = new LoginClient(socket, mOwnInfo);
                     loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
@@ -105,19 +154,12 @@ public class LoginModel implements ILoginContract.Model {
                     });
                     new Thread(loginClient).start();
                 }
-                while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
-                    //循环，等待线程结束
-                }
-                isFinish = true;
-            } catch (UnknownHostException e) {
-                isFinish = true;
-                e.printStackTrace();
-                Log.d(TAG, "UnknownHostException : " + e.getMessage());
-            } catch (IOException e) {
-                isFinish = true;
-                e.printStackTrace();
-                Log.d(TAG, "IOException : " + e.getMessage());
             }
+            while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
+                //循环，等待线程结束
+            }
+            isFinish = true;
         }
     }
+
 }

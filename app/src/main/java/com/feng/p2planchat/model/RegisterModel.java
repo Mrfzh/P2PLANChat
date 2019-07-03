@@ -78,38 +78,74 @@ public class RegisterModel implements IRegisterContract.Model{
 
         @Override
         public void run() {
-            try {
-                //得到其他在线用户的ip地址
-                List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+//            try {
+//                //得到其他在线用户的ip地址
+//                List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+//
+//                //给每个在线用户发出请求
+//                for (int i = 0; i < ipAddressList.size(); i++) {
+//                    //注意：如果对方没有打开相应端口，会抛出IOException
+//                    Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+//                    mUserNum++;
+//                    LoginClient loginClient = new LoginClient(socket, mOwnInfo);
+//                    loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
+//                        @Override
+//                        public void getUserInfo(User user) {
+//                            mUserList.add(user);
+//                            mAtomicInteger.incrementAndGet();
+//                        }
+//                    });
+//                    new Thread(loginClient).start();
+//                }
+//                while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
+//                    //循环，等待线程结束
+//                }
+//                isFinish = true;
+//            } catch (UnknownHostException e) {
+//                isFinish = true;
+//                e.printStackTrace();
+//                Log.d(TAG, "UnknownHostException : " + e.getMessage());
+//            } catch (IOException e) {
+//                isFinish = true;
+//                e.printStackTrace();
+//                Log.d(TAG, "IOException : " + e.getMessage());
+//            }
 
-                //给每个在线用户发出请求
-                for (int i = 0; i < ipAddressList.size(); i++) {
-                    //注意：如果对方没有打开相应端口，会抛出IOException
-                    Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
-                    mUserNum++;
-                    LoginClient loginClient = new LoginClient(socket, mOwnInfo);
-                    loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
-                        @Override
-                        public void getUserInfo(User user) {
-                            mUserList.add(user);
-                            mAtomicInteger.incrementAndGet();
-                        }
-                    });
-                    new Thread(loginClient).start();
+
+            //得到其他在线用户的ip地址
+            List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+
+            //给每个在线用户发出请求
+            for (int i = 0; i < ipAddressList.size(); i++) {
+                //注意：如果对方没有打开相应端口，会抛出IOException
+                Socket socket = null;
+                try {
+                    socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "UnknownHostException : " + e.getMessage());
+                    continue;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "IOException : " + e.getMessage());
+                    continue;
                 }
-                while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
-                    //循环，等待线程结束
-                }
-                isFinish = true;
-            } catch (UnknownHostException e) {
-                isFinish = true;
-                e.printStackTrace();
-                Log.d(TAG, "UnknownHostException : " + e.getMessage());
-            } catch (IOException e) {
-                isFinish = true;
-                e.printStackTrace();
-                Log.d(TAG, "IOException : " + e.getMessage());
+                mUserNum++;
+                LoginClient loginClient = new LoginClient(socket, mOwnInfo);
+                loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
+                    @Override
+                    public void getUserInfo(User user) {
+                        mUserList.add(user);
+                        mAtomicInteger.incrementAndGet();
+                    }
+                });
+                new Thread(loginClient).start();
             }
+            while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
+                //循环，等待线程结束
+            }
+            isFinish = true;
+
         }
     }
 }

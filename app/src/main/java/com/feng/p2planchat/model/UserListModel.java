@@ -83,38 +83,65 @@ public class UserListModel implements IUserListContract.Model {
 
         @Override
         public void run() {
-            try {
-//                Log.d(TAG, "run: mAtomicInteger.get() = " + mAtomicInteger.get());
-//                Log.d(TAG, "run: mUserNum = " + mUserNum);
-//                Log.d(TAG, "run: isFinish = " + isFinish);
+//            try {
+//
+//                //得到其他在线用户的ip地址
+//                List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+//
+//                //给每个在线用户发出请求
+//                for (int i = 0; i < ipAddressList.size(); i++) {
+//                    //注意：如果对方没有打开相应端口，会抛出IOException
+//                    Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+//                    mUserNum++;
+//                    LoginClient loginClient = new LoginClient(socket, mOwnInfo);
+//                    loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
+//                        @Override
+//                        public void getUserInfo(User user) {
+//                            mUserList.add(user);
+//                            mAtomicInteger.incrementAndGet();
+//                        }
+//                    });
+//                    new Thread(loginClient).start();
+//                }
+//                while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
+//                    //循环，等待线程结束
+//                }
+//                isFinish = true;
+//            } catch (UnknownHostException e) {
+//                isFinish = true;
+//            } catch (IOException e) {
+//                isFinish = true;
+//            }
 
-                //得到其他在线用户的ip地址
-                List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
+            //得到其他在线用户的ip地址
+            List<String> ipAddressList = IpAddressUtil.getIpAddressList(mContext);
 
-                //给每个在线用户发出请求
-                for (int i = 0; i < ipAddressList.size(); i++) {
-                    //注意：如果对方没有打开相应端口，会抛出IOException
-                    Socket socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
-                    mUserNum++;
-                    LoginClient loginClient = new LoginClient(socket, mOwnInfo);
-                    loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
-                        @Override
-                        public void getUserInfo(User user) {
-                            mUserList.add(user);
-                            mAtomicInteger.incrementAndGet();
-                        }
-                    });
-                    new Thread(loginClient).start();
+            //给每个在线用户发出请求
+            for (int i = 0; i < ipAddressList.size(); i++) {
+                //注意：如果对方没有打开相应端口，会抛出IOException
+                Socket socket = null;
+                try {
+                    socket = new Socket(ipAddressList.get(i), Constant.USER_PORT);
+                } catch (UnknownHostException e) {
+                    continue;
+                } catch (IOException e) {
+                    continue;
                 }
-                while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
-                    //循环，等待线程结束
-                }
-                isFinish = true;
-            } catch (UnknownHostException e) {
-                isFinish = true;
-            } catch (IOException e) {
-                isFinish = true;
+                mUserNum++;
+                LoginClient loginClient = new LoginClient(socket, mOwnInfo);
+                loginClient.setLoginClientListener(new LoginClient.LoginClientListener() {
+                    @Override
+                    public void getUserInfo(User user) {
+                        mUserList.add(user);
+                        mAtomicInteger.incrementAndGet();
+                    }
+                });
+                new Thread(loginClient).start();
             }
+            while (mUserNum != 0 && mAtomicInteger.get() < mUserNum) {
+                //循环，等待线程结束
+            }
+            isFinish = true;
         }
     }
 }
