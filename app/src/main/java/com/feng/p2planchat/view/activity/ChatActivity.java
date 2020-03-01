@@ -67,6 +67,7 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
     private static final int REQUEST_CODE_CHOOSE_FILE = 2;
     private static final int MESSAGE_UPDATE_LIST = 10;
     private static final int MESSAGE_UPDATE_ITEM = 11;
+    private static final int MESSAGE_TRANSFER_ERROR = 12;
 
     private TextView mTitleTv;
     private RecyclerView mChatRv;
@@ -105,6 +106,9 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
 //                    Log.d(TAG, "handleMessage: msg.getData().getInt(KEY_UPDATE_INDEX) = "
 //                            + msg.getData().getInt(KEY_UPDATE_INDEX));
                     mChatAdapter.notifyItemChanged(msg.getData().getInt(KEY_UPDATE_INDEX));
+                    break;
+                case MESSAGE_TRANSFER_ERROR:
+                    showShortToast("传输失败");
                     break;
                 default:
                     break;
@@ -576,6 +580,11 @@ public class ChatActivity extends BaseActivity<ChatPresenter>
                         Event<ChatDataEvent> chatDataEvent = new Event<>(EventBusCode.CHAT_2_USER_LIST,
                                 new ChatDataEvent(mOtherName, mOtherIp, mChatDataList));
                         EventBusUtil.sendEvent(chatDataEvent);
+                    }
+
+                    @Override
+                    public void transferError() {
+                        mHandler.obtainMessage(MESSAGE_TRANSFER_ERROR).sendToTarget();
                     }
                 });
                 new Thread(client).start();

@@ -13,6 +13,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -90,10 +92,12 @@ public class IpAddressUtil {
         final String prefix = ipAddr.substring(0, ipAddr.lastIndexOf(".") + 1);
         final AtomicInteger atomicInteger = new AtomicInteger(0);
 
+        Executor executor = Executors.newCachedThreadPool();
+
         //创建256个线程分别去ping
         for ( int i = 0; i < 256; i++) {
             final int finalI = i;
-            new Thread(new Runnable() {
+            executor.execute(new Runnable() {
                 public void run() {
                     //利用ping命令判断
                     String current_ip = prefix + finalI;
@@ -118,7 +122,7 @@ public class IpAddressUtil {
                         }
                     }
                 }
-            }).start();
+            });
         }
 
         while (atomicInteger.get() < 256) {

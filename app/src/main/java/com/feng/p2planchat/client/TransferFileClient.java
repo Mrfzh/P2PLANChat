@@ -7,6 +7,7 @@ import com.feng.p2planchat.util.FileUtil;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -31,6 +32,7 @@ public class TransferFileClient extends Thread {
         void currentProcess(int process);
         void fileNameAndLength(String fileName, String fileSize);
         void transferSuccess();
+        void transferError();
     }
 
     public TransferFileClient(Socket mSocket, String mFilePath) {
@@ -81,8 +83,12 @@ public class TransferFileClient extends Thread {
                     Log.d(TAG, "文件发送完毕");
                 }
             }
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
+            mListener.transferError();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mListener.transferError();
         } finally {
             try {
                 if (fis != null) {
